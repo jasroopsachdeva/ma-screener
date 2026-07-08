@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M&amp;A Screener</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .splash { text-align: center; text-decoration: none; }
+    .splash-title {
+        font-weight: 800;
+        font-size: clamp(2.6rem, 8vw, 4.5rem);
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        transition: color 0.15s ease, transform 0.15s ease;
+        display: inline-block;
+    }
+    .splash-title span { color: var(--accent); }
+    .splash:hover .splash-title { transform: scale(1.02); }
+    .splash-hint {
+        margin-top: 14px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        letter-spacing: 0.02em;
+    }
+    .splash:hover .splash-hint { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<a href="/shortlist.html" class="splash">
+    <div class="splash-title">M&amp;A <span>Screener</span></div>
+    <div class="splash-hint">Enter &rarr;</div>
+</a>
+
+</body>
+</html>

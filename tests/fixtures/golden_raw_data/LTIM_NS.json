@@ -1,0 +1,18 @@
+{
+  "ticker": "LTIM.NS",
+  "sector": "it",
+  "fetched_at": "2026-07-02T14:02:17.000435+00:00",
+  "market_cap": null,
+  "price": null,
+  "trailing_pe": null,
+  "ev_to_ebitda": null,
+  "return_on_equity": null,
+  "debt_to_equity": null,
+  "revenue_growth": null,
+  "net_margin": null,
+  "asset_turnover": null,
+  "total_debt": null,
+  "total_equity": null,
+  "fetch_ok": false,
+  "error": "yfinance returned an empty info payload for LTIM.NS (no exception, but no usable data \u2014 likely a transient Yahoo-side issue or an invalid/delisted symbol)"
+}

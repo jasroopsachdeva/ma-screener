@@ -1,0 +1,18 @@
+{
+  "ticker": "SHREECEM.NS",
+  "sector": "cement",
+  "fetched_at": "2026-07-01T13:14:52.053448+00:00",
+  "market_cap": 935213006848,
+  "price": 25920.0,
+  "trailing_pe": 54.385930,
+  "ev_to_ebitda": 32.687,
+  "return_on_equity": null,
+  "debt_to_equity": 53.744713,
+  "revenue_growth": 0.052,
+  "net_margin": 0.1453,
+  "asset_turnover": 0.9001157406909973,
+  "total_debt": 33939900416,
+  "total_equity": 232675300000.0,
+  "fetch_ok": true,
+  "error": null
+}

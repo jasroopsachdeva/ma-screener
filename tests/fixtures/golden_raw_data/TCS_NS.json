@@ -1,0 +1,18 @@
+{
+  "ticker": "TCS.NS",
+  "sector": "it",
+  "fetched_at": "2026-07-01T13:14:57.742075+00:00",
+  "market_cap": 7173219811328,
+  "price": 1982.6,
+  "trailing_pe": 14.566159,
+  "ev_to_ebitda": 10.031,
+  "return_on_equity": 0.48395002,
+  "debt_to_equity": 10.389,
+  "revenue_growth": 0.096,
+  "net_margin": 0.18429,
+  "asset_turnover": 2.4899384558000746,
+  "total_debt": 112829997056,
+  "total_equity": 1072400000000.0,
+  "fetch_ok": true,
+  "error": null
+}

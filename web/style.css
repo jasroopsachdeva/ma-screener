@@ -1,0 +1,386 @@
+/* ==========================================================================
+   M&A Screener — light, simple, clearly-separated design system
+   Modeled on Screener.in: soft lavender-white page background, white
+   bounded cards, ONE confident accent color (indigo), semantic green/red
+   reserved strictly for accretive/dilutive. Clean sans-serif throughout —
+   no display serif, minimal use of monospace (compact ticker labels only).
+   ========================================================================== */
+
+:root {
+    --bg-page: #F4F5FB;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #FAFAFF;
+    --border: #E4E6F0;
+    --text-primary: #1C1D2E;
+    --text-muted: #6B7085;
+    --accent: #5B4FE8;
+    --accent-hover: #4B3FD8;
+    --accent-dim: #EEEDFC;
+    --positive: #16A34A;
+    --positive-bg: #DCFCE7;
+    --negative: #DC2626;
+    --negative-bg: #FEE2E2;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.5;
+}
+
+h1, h2, h3 {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    margin: 0 0 0.4rem 0;
+}
+h2 { font-size: 1.4rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+
+p { margin: 0 0 1rem 0; color: var(--text-muted); }
+a { color: var(--accent); text-decoration: none; }
+
+/* ---- Nav ---- */
+#navbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    background-color: rgba(244, 245, 251, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+}
+.nav-left { display: flex; align-items: center; gap: 28px; }
+.nav-wordmark {
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+.nav-wordmark span { color: var(--accent); }
+.nav-links { display: flex; gap: 4px; align-items: center; }
+.nav-link {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background-color: transparent;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.nav-link:hover { background-color: var(--bg-card); color: var(--text-primary); }
+.nav-link.active { background-color: var(--accent-dim); color: var(--accent); font-weight: 600; }
+
+/* ---- Tools dropdown (modeled directly on the reference) ---- */
+.tools-wrap { position: relative; }
+.tools-trigger { display: flex; align-items: center; gap: 4px; }
+.tools-trigger::after { content: "\25BE"; font-size: 0.7rem; margin-left: 2px; }
+.tools-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 360px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(28, 29, 46, 0.12);
+    padding: 10px;
+    display: none;
+    z-index: 300;
+}
+/* Click-to-open only — hover was removed because it closed the instant
+   the mouse briefly left the trigger's bounding box while moving toward
+   the menu, before the user could actually click an item. */
+.tools-wrap.open .tools-menu {
+    display: block;
+}
+.tool-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+.tool-item:hover { background-color: var(--bg-page); }
+.tool-icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background-color: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+.tool-content {
+    /* Flex items default to min-width:auto, which lets long content push
+       past the parent's boundary instead of wrapping — this is what
+       caused the description text to overflow past the dropdown's edge.
+       flex:1 + min-width:0 forces it to respect the available width and
+       wrap normally instead. */
+    flex: 1;
+    min-width: 0;
+}
+.tool-title { font-weight: 600; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 2px; }
+.tool-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; }
+.tools-divider { height: 1px; background-color: var(--border); margin: 6px 4px; }
+
+/* ---- Buttons ---- */
+.btn {
+    display: inline-block;
+    background-color: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+.btn:hover { background-color: var(--accent-hover); }
+.btn-secondary { background-color: transparent; color: var(--text-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { background-color: var(--bg-card); }
+
+/* ---- Hero: simple, search-first ---- */
+#hero {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px 50px;
+}
+.wordmark-big {
+    font-weight: 800;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+.wordmark-big span { color: var(--accent); }
+.hero-subtitle {
+    max-width: 560px;
+    font-size: 1.02rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+}
+.search-bar {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    box-shadow: 0 2px 8px rgba(28, 29, 46, 0.04);
+}
+.search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.98rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+}
+.search-bar input::placeholder { color: var(--text-muted); }
+.search-icon { color: var(--text-muted); font-size: 1rem; }
+#search-results {
+    width: 100%;
+    max-width: 620px;
+    margin-top: 8px;
+    text-align: left;
+}
+.search-result-item {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-top: 6px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    transition: background-color 0.15s ease;
+}
+.search-result-item:hover { background-color: var(--bg-page); }
+.example-row {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    max-width: 700px;
+}
+.example-label { font-size: 0.85rem; color: var(--text-muted); margin-right: 4px; }
+.pill {
+    padding: 7px 15px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    user-select: none;
+}
+.pill:hover { border-color: var(--accent); background-color: var(--accent-dim); }
+.pill.active { background-color: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ---- Sections as clearly bounded cards ---- */
+main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+}
+.section {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 3px rgba(28, 29, 46, 0.03);
+    scroll-margin-top: 90px;
+}
+.section-caption {
+    max-width: 760px;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+}
+
+.pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+
+/* ---- Form controls ---- */
+.control-row { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 20px; align-items: flex-end; }
+.control { display: flex; flex-direction: column; gap: 6px; min-width: 200px; flex: 1; }
+.control label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+select {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+}
+input[type="range"] { width: 100%; accent-color: var(--accent); height: 4px; }
+.control-value { font-weight: 700; color: var(--accent); font-size: 0.85rem; }
+details {
+    background-color: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+details summary { cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text-primary); }
+details[open] summary { margin-bottom: 12px; }
+
+/* ---- Badges ---- */
+.badge {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+.badge-positive { color: var(--positive); background-color: var(--positive-bg); }
+.badge-negative { color: var(--negative); background-color: var(--negative-bg); }
+.badge-neutral { color: var(--accent); background-color: var(--accent-dim); }
+
+/* ---- Tables ---- */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th {
+    text-align: left;
+    padding: 11px 16px;
+    background-color: var(--bg-page);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+td { padding: 11px 16px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover { background-color: var(--bg-page); }
+.mono { font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+.cell-score { font-weight: 700; border-radius: 6px; }
+
+/* ---- Metric cards ---- */
+.metric-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 20px; }
+.metric-card {
+    flex: 1; min-width: 180px;
+    background-color: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+}
+.metric-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px; }
+.metric-value { font-size: 1.35rem; font-weight: 700; color: var(--text-primary); }
+.metric-delta { font-size: 0.82rem; font-weight: 700; margin-top: 4px; }
+.metric-delta.positive { color: var(--positive); }
+.metric-delta.negative { color: var(--negative); }
+
+/* ---- Heatmap ---- */
+.heatmap-wrap { overflow-x: auto; }
+.heatmap-table { border-collapse: collapse; font-size: 0.76rem; }
+.heatmap-table th { padding: 8px 10px; text-align: center; background-color: var(--bg-page); font-weight: 600; }
+.heatmap-cell { padding: 10px 14px; text-align: center; font-weight: 700; border: 1px solid var(--bg-card); position: relative; }
+.heatmap-cell.best::after { content: "\2605"; position: absolute; top: 2px; right: 4px; font-size: 0.65rem; }
+
+/* ---- Bar chart ---- */
+.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.bar-label { width: 110px; font-size: 0.8rem; text-align: right; flex-shrink: 0; }
+.bar-track { flex: 1; background-color: var(--bg-page); border-radius: 4px; height: 20px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.bar-value { font-size: 0.78rem; font-weight: 600; width: 65px; flex-shrink: 0; }
+
+/* ---- Explanations ---- */
+.explanation-item { background-color: var(--bg-page); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
+.explanation-ticker { font-weight: 700; color: var(--accent); margin-bottom: 4px; font-size: 0.9rem; }
+.explanation-text { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+/* ---- States ---- */
+.loading, .empty-state { padding: 32px; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+.error-state { padding: 16px 20px; background-color: var(--negative-bg); border: 1px solid var(--negative); border-radius: 10px; color: var(--negative); font-size: 0.87rem; }
+
+/* ---- Footer ---- */
+footer {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 30px 24px 50px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 720px) {
+    #navbar { flex-wrap: wrap; gap: 10px; }
+    .control-row { flex-direction: column; }
+    .tools-menu { width: 300px; }
+}

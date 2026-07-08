@@ -1,0 +1,18 @@
+{
+  "ticker": "ACC.NS",
+  "sector": "cement",
+  "fetched_at": "2026-07-01T13:14:49.457877+00:00",
+  "market_cap": 250170179584,
+  "price": 1332.2,
+  "trailing_pe": 11.739512,
+  "ev_to_ebitda": 9.087,
+  "return_on_equity": 0.109280005,
+  "debt_to_equity": 2.085,
+  "revenue_growth": 0.323,
+  "net_margin": 0.082959995,
+  "asset_turnover": 1.2187217464845206,
+  "total_debt": 4286099968,
+  "total_equity": 205505400000.0,
+  "fetch_ok": true,
+  "error": null
+}

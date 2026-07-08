@@ -1,0 +1,37 @@
+name: Test Suite
+
+# Runs on every push and pull request. Unlike run_screener.yml (which
+# pulls live data on a schedule), this workflow needs no network access —
+# every test here is either a mock or runs against the committed golden
+# snapshot in tests/fixtures/golden_raw_data/. That makes this fast,
+# deterministic, and safe to run on every single commit: it catches a
+# regression the moment it's introduced, rather than waiting for the next
+# scheduled live run to fail at 3am.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run all mock tests
+        run: |
+          for f in tests/test_*.py; do
+            echo "=== $f ==="
+            python "$f" || exit 1
+          done

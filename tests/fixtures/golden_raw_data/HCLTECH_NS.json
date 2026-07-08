@@ -1,0 +1,18 @@
+{
+  "ticker": "HCLTECH.NS",
+  "sector": "it",
+  "fetched_at": "2026-07-01T13:14:59.453522+00:00",
+  "market_cap": 2798303838208,
+  "price": 1034.2,
+  "trailing_pe": 16.868372,
+  "ev_to_ebitda": 999.789,
+  "return_on_equity": 0.23357001,
+  "debt_to_equity": 6.935,
+  "revenue_growth": 0.053,
+  "net_margin": 0.128,
+  "asset_turnover": 1.731444156189716,
+  "total_debt": 550000000,
+  "total_equity": 751650000000.0,
+  "fetch_ok": true,
+  "error": null
+}

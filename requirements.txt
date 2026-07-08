@@ -1,0 +1,12 @@
+# M&A Screener dependencies.
+# Minimum versions rather than exact pins, so this doesn't force a
+# downgrade of whatever you already have installed locally — GitHub
+# Actions will always get fresh installs of at least these versions.
+
+yfinance>=1.5.0
+pyyaml>=6.0
+pandas>=2.0.0
+streamlit>=1.32.0
+plotly>=5.18.0
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0

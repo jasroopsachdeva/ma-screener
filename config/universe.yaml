@@ -1,0 +1,261 @@
+# M&A Screener — universe and settings config
+# Edit this file to change what the screener covers. No code changes needed.
+#
+# Universe expanded from 16 (cement + IT only) to ~200 tickers across 16
+# sectors. A handful of tickers may fail to resolve via yfinance (renamed,
+# delisted, or restructured entities) — this is expected and handled
+# gracefully by the pipeline: excluded cleanly with a logged reason, not
+# a crash. Check data/processed/cleaning_flags.csv after a run to see
+# exactly which ones, if any, and prune them from this list if they're
+# persistently broken rather than transient.
+
+universe:
+  # --- Cement (8) ---
+  - {ticker: ACC.NS, sector: cement}
+  - {ticker: AMBUJACEM.NS, sector: cement}
+  - {ticker: ULTRACEMCO.NS, sector: cement}
+  - {ticker: SHREECEM.NS, sector: cement}
+  - {ticker: JKCEMENT.NS, sector: cement}
+  - {ticker: RAMCOCEM.NS, sector: cement}
+  - {ticker: HEIDELBERG.NS, sector: cement}
+  - {ticker: DALBHARAT.NS, sector: cement}
+
+  # --- IT / Technology (13) ---
+  - {ticker: INFY.NS, sector: it}
+  - {ticker: TCS.NS, sector: it}
+  - {ticker: WIPRO.NS, sector: it}
+  - {ticker: HCLTECH.NS, sector: it}
+  - {ticker: TECHM.NS, sector: it}
+  - {ticker: LTIM.NS, sector: it}
+  - {ticker: PERSISTENT.NS, sector: it}
+  - {ticker: COFORGE.NS, sector: it}
+  - {ticker: MPHASIS.NS, sector: it}
+  - {ticker: LTTS.NS, sector: it}
+  - {ticker: TATAELXSI.NS, sector: it}
+  - {ticker: CYIENT.NS, sector: it}
+  - {ticker: KPITTECH.NS, sector: it}
+
+  # --- Banking (19) ---
+  - {ticker: HDFCBANK.NS, sector: banking}
+  - {ticker: ICICIBANK.NS, sector: banking}
+  - {ticker: SBIN.NS, sector: banking}
+  - {ticker: AXISBANK.NS, sector: banking}
+  - {ticker: KOTAKBANK.NS, sector: banking}
+  - {ticker: INDUSINDBK.NS, sector: banking}
+  - {ticker: FEDERALBNK.NS, sector: banking}
+  - {ticker: BANDHANBNK.NS, sector: banking}
+  - {ticker: IDFCFIRSTB.NS, sector: banking}
+  - {ticker: PNB.NS, sector: banking}
+  - {ticker: BANKBARODA.NS, sector: banking}
+  - {ticker: CANBK.NS, sector: banking}
+  - {ticker: UNIONBANK.NS, sector: banking}
+  - {ticker: AUBANK.NS, sector: banking}
+  - {ticker: RBLBANK.NS, sector: banking}
+  - {ticker: BANKINDIA.NS, sector: banking}
+  - {ticker: CENTRALBK.NS, sector: banking}
+  - {ticker: IOB.NS, sector: banking}
+  - {ticker: UCOBANK.NS, sector: banking}
+
+  # --- NBFC / Financial Services (14) ---
+  - {ticker: BAJFINANCE.NS, sector: nbfc_financial_services}
+  - {ticker: BAJAJFINSV.NS, sector: nbfc_financial_services}
+  - {ticker: CHOLAFIN.NS, sector: nbfc_financial_services}
+  - {ticker: MUTHOOTFIN.NS, sector: nbfc_financial_services}
+  - {ticker: LICHSGFIN.NS, sector: nbfc_financial_services}
+  - {ticker: SHRIRAMFIN.NS, sector: nbfc_financial_services}
+  - {ticker: PFC.NS, sector: nbfc_financial_services}
+  - {ticker: RECLTD.NS, sector: nbfc_financial_services}
+  - {ticker: IRFC.NS, sector: nbfc_financial_services}
+  - {ticker: HUDCO.NS, sector: nbfc_financial_services}
+  - {ticker: BAJAJHLDNG.NS, sector: nbfc_financial_services}
+  - {ticker: SBICARD.NS, sector: nbfc_financial_services}
+  - {ticker: MANAPPURAM.NS, sector: nbfc_financial_services}
+  - {ticker: POONAWALLA.NS, sector: nbfc_financial_services}
+
+  # --- Insurance (6) ---
+  - {ticker: HDFCLIFE.NS, sector: insurance}
+  - {ticker: SBILIFE.NS, sector: insurance}
+  - {ticker: ICICIPRULI.NS, sector: insurance}
+  - {ticker: ICICIGI.NS, sector: insurance}
+  - {ticker: LICI.NS, sector: insurance}
+  - {ticker: GICRE.NS, sector: insurance}
+
+  # --- Auto & Auto Components (17) ---
+  - {ticker: MARUTI.NS, sector: auto}
+  - {ticker: TMPV.NS, sector: auto}
+  - {ticker: TMCV.NS, sector: auto}
+  - {ticker: M&M.NS, sector: auto}
+  - {ticker: EICHERMOT.NS, sector: auto}
+  - {ticker: HEROMOTOCO.NS, sector: auto}
+  - {ticker: BAJAJ-AUTO.NS, sector: auto}
+  - {ticker: TVSMOTOR.NS, sector: auto}
+  - {ticker: ASHOKLEY.NS, sector: auto}
+  - {ticker: BHARATFORG.NS, sector: auto}
+  - {ticker: MOTHERSON.NS, sector: auto}
+  - {ticker: BOSCHLTD.NS, sector: auto}
+  - {ticker: MRF.NS, sector: auto}
+  - {ticker: ENDURANCE.NS, sector: auto}
+  - {ticker: EXIDEIND.NS, sector: auto}
+  - {ticker: ARE&M.NS, sector: auto}
+  - {ticker: SUNDRMFAST.NS, sector: auto}
+  - {ticker: UNOMINDA.NS, sector: auto}
+
+  # --- Pharma & Healthcare (18) ---
+  - {ticker: SUNPHARMA.NS, sector: pharma_healthcare}
+  - {ticker: DRREDDY.NS, sector: pharma_healthcare}
+  - {ticker: CIPLA.NS, sector: pharma_healthcare}
+  - {ticker: DIVISLAB.NS, sector: pharma_healthcare}
+  - {ticker: LUPIN.NS, sector: pharma_healthcare}
+  - {ticker: AUROPHARMA.NS, sector: pharma_healthcare}
+  - {ticker: BIOCON.NS, sector: pharma_healthcare}
+  - {ticker: TORNTPHARM.NS, sector: pharma_healthcare}
+  - {ticker: ALKEM.NS, sector: pharma_healthcare}
+  - {ticker: ABBOTINDIA.NS, sector: pharma_healthcare}
+  - {ticker: APOLLOHOSP.NS, sector: pharma_healthcare}
+  - {ticker: FORTIS.NS, sector: pharma_healthcare}
+  - {ticker: LALPATHLAB.NS, sector: pharma_healthcare}
+  - {ticker: METROPOLIS.NS, sector: pharma_healthcare}
+  - {ticker: GLAND.NS, sector: pharma_healthcare}
+  - {ticker: LAURUSLABS.NS, sector: pharma_healthcare}
+  - {ticker: GLENMARK.NS, sector: pharma_healthcare}
+  - {ticker: IPCALAB.NS, sector: pharma_healthcare}
+
+  # --- FMCG (12) ---
+  - {ticker: HINDUNILVR.NS, sector: fmcg}
+  - {ticker: ITC.NS, sector: fmcg}
+  - {ticker: NESTLEIND.NS, sector: fmcg}
+  - {ticker: BRITANNIA.NS, sector: fmcg}
+  - {ticker: DABUR.NS, sector: fmcg}
+  - {ticker: GODREJCP.NS, sector: fmcg}
+  - {ticker: MARICO.NS, sector: fmcg}
+  - {ticker: COLPAL.NS, sector: fmcg}
+  - {ticker: TATACONSUM.NS, sector: fmcg}
+  - {ticker: VBL.NS, sector: fmcg}
+  - {ticker: UNITDSPR.NS, sector: fmcg}
+  - {ticker: EMAMILTD.NS, sector: fmcg}
+
+  # --- Metals & Mining (15) ---
+  - {ticker: TATASTEEL.NS, sector: metals_mining}
+  - {ticker: JSWSTEEL.NS, sector: metals_mining}
+  - {ticker: HINDALCO.NS, sector: metals_mining}
+  - {ticker: VEDL.NS, sector: metals_mining}
+  - {ticker: COALINDIA.NS, sector: metals_mining}
+  - {ticker: NMDC.NS, sector: metals_mining}
+  - {ticker: SAIL.NS, sector: metals_mining}
+  - {ticker: JINDALSTEL.NS, sector: metals_mining}
+  - {ticker: APLAPOLLO.NS, sector: metals_mining}
+  - {ticker: NATIONALUM.NS, sector: metals_mining}
+  - {ticker: HINDCOPPER.NS, sector: metals_mining}
+  - {ticker: RATNAMANI.NS, sector: metals_mining}
+  - {ticker: HINDZINC.NS, sector: metals_mining}
+  - {ticker: WELCORP.NS, sector: metals_mining}
+  - {ticker: JSL.NS, sector: metals_mining}
+
+  # --- Energy / Oil & Gas / Power (11) ---
+  - {ticker: RELIANCE.NS, sector: energy_power}
+  - {ticker: ONGC.NS, sector: energy_power}
+  - {ticker: BPCL.NS, sector: energy_power}
+  - {ticker: IOC.NS, sector: energy_power}
+  - {ticker: GAIL.NS, sector: energy_power}
+  - {ticker: NTPC.NS, sector: energy_power}
+  - {ticker: POWERGRID.NS, sector: energy_power}
+  - {ticker: TATAPOWER.NS, sector: energy_power}
+  - {ticker: ADANIGREEN.NS, sector: energy_power}
+  - {ticker: ADANIPOWER.NS, sector: energy_power}
+  - {ticker: TORNTPOWER.NS, sector: energy_power}
+
+  # --- Capital Goods / Industrials (18) ---
+  - {ticker: LT.NS, sector: capital_goods}
+  - {ticker: SIEMENS.NS, sector: capital_goods}
+  - {ticker: ABB.NS, sector: capital_goods}
+  - {ticker: HAL.NS, sector: capital_goods}
+  - {ticker: BEL.NS, sector: capital_goods}
+  - {ticker: BHEL.NS, sector: capital_goods}
+  - {ticker: CUMMINSIND.NS, sector: capital_goods}
+  - {ticker: THERMAX.NS, sector: capital_goods}
+  - {ticker: POLYCAB.NS, sector: capital_goods}
+  - {ticker: KEI.NS, sector: capital_goods}
+  - {ticker: HAVELLS.NS, sector: capital_goods}
+  - {ticker: CROMPTON.NS, sector: capital_goods}
+  - {ticker: SUPREMEIND.NS, sector: capital_goods}
+  - {ticker: ASTRAL.NS, sector: capital_goods}
+  - {ticker: GRINDWELL.NS, sector: capital_goods}
+  - {ticker: CARBORUNIV.NS, sector: capital_goods}
+  - {ticker: TIMKEN.NS, sector: capital_goods}
+  - {ticker: SKFINDIA.NS, sector: capital_goods}
+
+  # --- Chemicals (12) ---
+  - {ticker: SRF.NS, sector: chemicals}
+  - {ticker: PIIND.NS, sector: chemicals}
+  - {ticker: DEEPAKNTR.NS, sector: chemicals}
+  - {ticker: AARTIIND.NS, sector: chemicals}
+  - {ticker: NAVINFLUOR.NS, sector: chemicals}
+  - {ticker: UPL.NS, sector: chemicals}
+  - {ticker: COROMANDEL.NS, sector: chemicals}
+  - {ticker: CHAMBLFERT.NS, sector: chemicals}
+  - {ticker: GNFC.NS, sector: chemicals}
+  - {ticker: PIDILITIND.NS, sector: chemicals}
+  - {ticker: TATACHEM.NS, sector: chemicals}
+  - {ticker: GHCL.NS, sector: chemicals}
+
+  # --- Consumer Durables / Retail (14) ---
+  - {ticker: TITAN.NS, sector: consumer_durables_retail}
+  - {ticker: DMART.NS, sector: consumer_durables_retail}
+  - {ticker: TRENT.NS, sector: consumer_durables_retail}
+  - {ticker: BATAINDIA.NS, sector: consumer_durables_retail}
+  - {ticker: PAGEIND.NS, sector: consumer_durables_retail}
+  - {ticker: JUBLFOOD.NS, sector: consumer_durables_retail}
+  - {ticker: VOLTAS.NS, sector: consumer_durables_retail}
+  - {ticker: DIXON.NS, sector: consumer_durables_retail}
+  - {ticker: RELAXO.NS, sector: consumer_durables_retail}
+  - {ticker: KAJARIACER.NS, sector: consumer_durables_retail}
+  - {ticker: WHIRLPOOL.NS, sector: consumer_durables_retail}
+  - {ticker: BLUESTARCO.NS, sector: consumer_durables_retail}
+  - {ticker: PGHH.NS, sector: consumer_durables_retail}
+  - {ticker: GILLETTE.NS, sector: consumer_durables_retail}
+
+  # --- Telecom & Media (5) ---
+  - {ticker: BHARTIARTL.NS, sector: telecom_media}
+  - {ticker: IDEA.NS, sector: telecom_media}
+  - {ticker: INDUSTOWER.NS, sector: telecom_media}
+  - {ticker: PVRINOX.NS, sector: telecom_media}
+  - {ticker: ZEEL.NS, sector: telecom_media}
+
+  # --- Infrastructure / Logistics / Defense (12) ---
+  - {ticker: ADANIPORTS.NS, sector: infra_logistics_defense}
+  - {ticker: ADANIENT.NS, sector: infra_logistics_defense}
+  - {ticker: GMRAIRPORT.NS, sector: infra_logistics_defense}
+  - {ticker: CONCOR.NS, sector: infra_logistics_defense}
+  - {ticker: IRCTC.NS, sector: infra_logistics_defense}
+  - {ticker: INDIGO.NS, sector: infra_logistics_defense}
+  - {ticker: RVNL.NS, sector: infra_logistics_defense}
+  - {ticker: IRCON.NS, sector: infra_logistics_defense}
+  - {ticker: NBCC.NS, sector: infra_logistics_defense}
+  - {ticker: NCC.NS, sector: infra_logistics_defense}
+  - {ticker: MAZDOCK.NS, sector: infra_logistics_defense}
+  - {ticker: COCHINSHIP.NS, sector: infra_logistics_defense}
+
+  # --- Realty (6) ---
+  - {ticker: DLF.NS, sector: realty}
+  - {ticker: GODREJPROP.NS, sector: realty}
+  - {ticker: OBEROIRLTY.NS, sector: realty}
+  - {ticker: PRESTIGE.NS, sector: realty}
+  - {ticker: PHOENIXLTD.NS, sector: realty}
+  - {ticker: SOBHA.NS, sector: realty}
+
+data:
+  lookback_years: 5          # historical financials window
+  cache_dir: "data/raw"
+  cache_expiry_days: 1       # refetch if cache older than this
+  request_delay_seconds: 0.4 # politeness delay between successful fetches — at 200 tickers, hitting yfinance without any pacing meaningfully increases rate-limit failures
+
+scoring:
+  weights:
+    valuation: 0.30
+    quality: 0.30
+    leverage: 0.20
+    growth: 0.20
+
+output:
+  results_dir: "data/processed"
+  top_n_shortlist: 10

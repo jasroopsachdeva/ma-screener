@@ -1,0 +1,18 @@
+{
+  "ticker": "AMBUJACEM.NS",
+  "sector": "cement",
+  "fetched_at": "2026-07-01T13:14:50.382695+00:00",
+  "market_cap": 1040765681664,
+  "price": 418.85,
+  "trailing_pe": 21.963818,
+  "ev_to_ebitda": 18.313,
+  "return_on_equity": 0.08302,
+  "debt_to_equity": 1.205,
+  "revenue_growth": 0.072,
+  "net_margin": 0.1163,
+  "asset_turnover": 0.6734828127032526,
+  "total_debt": 8659300352,
+  "total_equity": 593473200000.0,
+  "fetch_ok": true,
+  "error": null
+}

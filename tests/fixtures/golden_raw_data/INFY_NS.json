@@ -1,0 +1,18 @@
+{
+  "ticker": "INFY.NS",
+  "sector": "it",
+  "fetched_at": "2026-07-01T13:14:56.876834+00:00",
+  "market_cap": 3989408575984,
+  "price": 1985.3,
+  "trailing_pe": 13.062442,
+  "ev_to_ebitda": 913.702,
+  "return_on_equity": 0.31439,
+  "debt_to_equity": 9.827,
+  "revenue_growth": 0.066,
+  "net_margin": 0.16434999,
+  "asset_turnover": 2.0598814633149396,
+  "total_debt": 967000000,
+  "total_equity": 9786000000.0,
+  "fetch_ok": true,
+  "error": null
+}

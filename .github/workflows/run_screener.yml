@@ -1,0 +1,66 @@
+name: Run M&A Screener Pipeline
+
+# Runs the full pipeline daily and on manual trigger. On failure, GitHub
+# automatically emails the repo owner (the account that owns/watches this
+# repo) — no separate alerting service needed at this scale. This is a
+# genuine, standard way to get notified: Settings > Notifications >
+# Actions on your GitHub account controls whether these arrive by email.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # 3:00 AM UTC daily = 8:30 AM IST
+  workflow_dispatch: {}   # allows manually triggering a run from the Actions tab
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Bumped from 20 to 45 minutes after the universe expanded from 16 to
+    # 200 tickers. Ingestion alone is now meaningfully slower: a politeness
+    # delay was added between requests (config/universe.yaml ->
+    # data.request_delay_seconds) to reduce yfinance rate-limit failures at
+    # this scale, and more tickers means more retries on the tail end.
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run the full pipeline
+        run: python -m src.run_pipeline
+        # A non-zero exit code here (from either a validation failure or a
+        # crash — see src/run_pipeline.py) marks this step, and therefore
+        # this whole workflow run, as failed. That failure is what
+        # triggers GitHub's notification.
+
+      - name: Upload results as workflow artifact
+        if: always()  # upload even on failure, so partial/pre-failure data is inspectable
+        uses: actions/upload-artifact@v4
+        with:
+          name: screener-results-${{ github.run_number }}
+          path: |
+            data/processed/
+            logs/
+          retention-days: 30
+
+      - name: Commit updated results back to the repo
+        if: success()  # only commit on a fully successful, validated run
+        run: |
+          git config user.name "screener-bot"
+          git config user.email "actions@github.com"
+          git add data/processed/
+          git diff --cached --quiet || git commit -m "Automated screener run: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
