@@ -10,3 +10,5 @@ streamlit>=1.32.0
 plotly>=5.18.0
 fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
+reportlab>=4.0.0
+pypdf>=4.0.0
