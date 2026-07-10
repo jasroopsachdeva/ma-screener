@@ -15,6 +15,11 @@ jobs:
   run-pipeline:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: write
+      # Default GITHUB_TOKEN is read-only on most accounts now; the
+      # "Commit updated results back to the repo" step below needs write
+      # access to push, otherwise git push fails with exit code 128.
     # Bumped from 20 to 45 minutes after the universe expanded from 16 to
     # 200 tickers. Ingestion alone is now meaningfully slower: a politeness
     # delay was added between requests (config/universe.yaml ->
