@@ -9,7 +9,7 @@ data/raw/*.json
 data/processed/*.csv
 data/processed/*.pdf
 data/history/*.csv
-logs/
+/logs/
 .ipynb_checkpoints/
 .DS_Store
 .vscode/
