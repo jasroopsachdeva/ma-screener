@@ -1,4 +1,4 @@
-"""
+﻿"""
 cleaning.py — Cleaning and normalization layer for the M&A screener.
 
 Reads raw per-ticker JSON snapshots from src/ingestion.py and produces one
@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 # Fields where a missing value is critical enough to exclude the row from scoring
-CRITICAL_FIELDS = ["market_cap", "price", "trailing_pe"]
+CRITICAL_FIELDS = ["market_cap", "price"]  # trailing_pe demoted 2026-08-05: null PE usually means negative EPS, which excluded loss-making firms — over-represented among acquisition targets
 
 # Sanity bounds — values outside these ranges are flagged as likely data errors,
 # not necessarily dropped, since some are legitimate extremes (e.g. loss-making
