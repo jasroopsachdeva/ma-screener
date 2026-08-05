@@ -1,8 +1,8 @@
-name: Run M&A Screener Pipeline
+﻿name: Run M&A Screener Pipeline
 
 # Runs the full pipeline daily and on manual trigger. On failure, GitHub
 # automatically emails the repo owner (the account that owns/watches this
-# repo) — no separate alerting service needed at this scale. This is a
+# repo) â€” no separate alerting service needed at this scale. This is a
 # genuine, standard way to get notified: Settings > Notifications >
 # Actions on your GitHub account controls whether these arrive by email.
 
@@ -49,7 +49,7 @@ jobs:
       - name: Run the full pipeline
         run: python -m src.run_pipeline
         # A non-zero exit code here (from either a validation failure or a
-        # crash — see src/run_pipeline.py) marks this step, and therefore
+        # crash â€” see src/run_pipeline.py) marks this step, and therefore
         # this whole workflow run, as failed. That failure is what
         # triggers GitHub's notification.
 
@@ -66,7 +66,7 @@ jobs:
       - name: Commit updated results back to the repo
         if: success()  # only commit on a fully successful, validated run
         run: |
-		DEST="snapshots/run-$(printf '%02d' ${{ github.run_number }})"
+          DEST="snapshots/run-$(printf '%02d' ${{ github.run_number }})"
           mkdir -p "$DEST/logs"
           cp -r data/processed/* "$DEST"/
           cp -r logs/* "$DEST"/logs/ 2>/dev/null || true
