@@ -10,6 +10,8 @@ on:
   schedule:
     - cron: "0 3 * * *"  # 3:00 AM UTC daily = 8:30 AM IST
   workflow_dispatch: {}   # allows manually triggering a run from the Actions tab
+permissions:
+  contents: write
 
 jobs:
   run-pipeline:
@@ -64,8 +66,14 @@ jobs:
       - name: Commit updated results back to the repo
         if: success()  # only commit on a fully successful, validated run
         run: |
+		DEST="snapshots/run-$(printf '%02d' ${{ github.run_number }})"
+          mkdir -p "$DEST/logs"
+          cp -r data/processed/* "$DEST"/
+          cp -r logs/* "$DEST"/logs/ 2>/dev/null || true
           git config user.name "screener-bot"
           git config user.email "actions@github.com"
-          git add data/processed/
-          git diff --cached --quiet || git commit -m "Automated screener run: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git add -f "$DEST"
+          git diff --cached --quiet && { echo "ERROR: nothing staged"; exit 1; }
+          git commit -m "Automated screener run #${{ github.run_number }}: $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
+          
