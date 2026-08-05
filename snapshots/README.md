@@ -16,3 +16,16 @@ artifacts on 2026-08-05 (90-day retention would have started expiring in October
 - fetch_ok is always True - failed fetches are dropped before write, so the
   column cannot flag problems. Row count is the only signal.
 - Run #23 took 8m03s vs ~3m45s baseline but returned complete data.
+
+## Model change 2026-08-05 (commit b587bf0)
+
+Runs #1-31 were scored under scoring-v1: 196-ticker effective universe,
+trailing_pe a hard-exclusion critical field.
+
+From run #32 onward: 200 tickers. trailing_pe demoted to optional;
+CROMPTON, INDIGO, TATACHEM, TMPV recovered and scored with the
+valuation bucket falling back to ev_to_ebitda. Only LTIM still drops,
+on a genuine fetch failure.
+
+Do not pool runs across this boundary without accounting for the change.
+
