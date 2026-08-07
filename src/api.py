@@ -1,4 +1,4 @@
-"""
+﻿"""
 api.py — Backend API for the M&A screener's custom frontend.
 
 Wraps the EXISTING, already-tested pipeline logic (accretion_dilution.py,
@@ -36,7 +36,7 @@ from src.acquisition_likelihood import score_acquisition_likelihood
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-DATA_DIR = "data/processed"
+DATA_DIR = "data/processed" if Path("data/processed/scored_universe.csv").exists() else str(sorted(Path(__file__).resolve().parent.parent.glob("snapshots/**/scored_universe.csv"))[-1].parent)
 WEB_DIR = str(Path(__file__).resolve().parent.parent / "web")
 
 app = FastAPI(title="M&A Screener API")
