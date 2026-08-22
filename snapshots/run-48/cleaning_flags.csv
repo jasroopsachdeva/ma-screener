@@ -1,0 +1,202 @@
+ticker,excluded,exclusion_reason,missing_fields,outlier_fields,negative_equity,zero_or_negative_revenue_proxy
+AARTIIND.NS,False,,['return_on_equity'],[],False,False
+ABBOTINDIA.NS,False,,['return_on_equity'],[],False,False
+ABB.NS,False,,[],[],False,False
+ACC.NS,False,,['return_on_equity'],[],False,False
+ADANIENT.NS,False,,['return_on_equity'],[],False,False
+ADANIGREEN.NS,False,,['return_on_equity'],[],False,False
+ADANIPORTS.NS,False,,['return_on_equity'],[],False,False
+ADANIPOWER.NS,False,,['return_on_equity'],[],False,False
+ALKEM.NS,False,,['return_on_equity'],[],False,False
+AMBUJACEM.NS,False,,['return_on_equity'],[],False,False
+APLAPOLLO.NS,False,,['return_on_equity'],[],False,False
+APOLLOHOSP.NS,False,,['return_on_equity'],[],False,False
+ARE&M.NS,False,,['return_on_equity'],[],False,False
+ASHOKLEY.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'return_on_equity']",[],False,False
+ASTRAL.NS,False,,['return_on_equity'],[],False,False
+AUBANK.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity']",[],False,False
+AUROPHARMA.NS,False,,['return_on_equity'],[],False,False
+AXISBANK.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+BAJAJ-AUTO.NS,False,,['return_on_equity'],[],False,False
+BAJAJFINSV.NS,False,,['return_on_equity'],[],False,False
+BAJAJHLDNG.NS,False,,[],['net_margin'],False,False
+BAJFINANCE.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+BANDHANBNK.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity']",[],False,False
+BANKBARODA.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+BANKINDIA.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+BATAINDIA.NS,False,,['return_on_equity'],[],False,False
+BEL.NS,False,,['return_on_equity'],[],False,False
+BHARATFORG.NS,False,,['return_on_equity'],[],False,False
+BHARTIARTL.NS,False,,[],[],False,False
+BHEL.NS,False,,['return_on_equity'],[],False,False
+BIOCON.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'return_on_equity']",[],False,False
+BLUESTARCO.NS,False,,['return_on_equity'],[],False,False
+BOSCHLTD.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'return_on_equity']",[],False,False
+BPCL.NS,False,,['return_on_equity'],[],False,False
+BRITANNIA.NS,False,,['return_on_equity'],[],False,False
+CANBK.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity']",[],False,False
+CARBORUNIV.NS,False,,['return_on_equity'],[],False,False
+CENTRALBK.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+CHAMBLFERT.NS,False,,['return_on_equity'],[],False,False
+CHOLAFIN.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+CIPLA.NS,False,,['return_on_equity'],[],False,False
+COALINDIA.NS,False,,['return_on_equity'],[],False,False
+COCHINSHIP.NS,False,,[],[],False,False
+COFORGE.NS,False,,['return_on_equity'],[],False,False
+COLPAL.NS,False,,['return_on_equity'],[],False,False
+CONCOR.NS,False,,['return_on_equity'],[],False,False
+COROMANDEL.NS,False,,['return_on_equity'],[],False,False
+CROMPTON.NS,False,,"['trailing_pe', 'return_on_equity']",[],False,False
+CUMMINSIND.NS,False,,['return_on_equity'],[],False,False
+CYIENT.NS,False,,['return_on_equity'],[],False,False
+DABUR.NS,False,,['return_on_equity'],[],False,False
+DALBHARAT.NS,False,,['return_on_equity'],[],False,False
+DEEPAKNTR.NS,False,,['return_on_equity'],[],False,False
+DIVISLAB.NS,False,,['return_on_equity'],[],False,False
+DIXON.NS,False,,['return_on_equity'],[],False,False
+DLF.NS,False,,[],[],False,False
+DMART.NS,False,,['return_on_equity'],[],False,False
+DRREDDY.NS,False,,[],[],False,False
+EICHERMOT.NS,False,,['return_on_equity'],[],False,False
+EMAMILTD.NS,False,,['return_on_equity'],[],False,False
+ENDURANCE.NS,False,,['return_on_equity'],[],False,False
+EXIDEIND.NS,False,,['return_on_equity'],[],False,False
+FEDERALBNK.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity']",[],False,False
+FORTIS.NS,False,,['return_on_equity'],[],False,False
+GAIL.NS,False,,['return_on_equity'],[],False,False
+GHCL.NS,False,,['return_on_equity'],[],False,False
+GICRE.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+GILLETTE.NS,False,,['return_on_equity'],[],False,False
+GLAND.NS,False,,['return_on_equity'],[],False,False
+GLENMARK.NS,False,,['return_on_equity'],[],False,False
+GMRAIRPORT.NS,False,,"['return_on_equity', 'debt_to_equity']",[],True,True
+GNFC.NS,False,,['return_on_equity'],[],False,False
+GODREJCP.NS,False,,['return_on_equity'],[],False,False
+GODREJPROP.NS,False,,['return_on_equity'],[],False,False
+GRINDWELL.NS,False,,['return_on_equity'],[],False,False
+HAL.NS,False,,['return_on_equity'],[],False,False
+HAVELLS.NS,False,,['return_on_equity'],[],False,False
+HCLTECH.NS,False,,[],['ev_to_ebitda'],False,False
+HDFCBANK.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+HDFCLIFE.NS,False,,[],[],False,False
+HEIDELBERG.NS,False,,['return_on_equity'],[],False,False
+HEROMOTOCO.NS,False,,['return_on_equity'],[],False,False
+HINDALCO.NS,False,,['return_on_equity'],[],False,False
+HINDCOPPER.NS,False,,['return_on_equity'],[],False,False
+HINDUNILVR.NS,False,,['return_on_equity'],[],False,False
+HINDZINC.NS,False,,['return_on_equity'],[],False,False
+HUDCO.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+ICICIBANK.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+ICICIGI.NS,False,,['debt_to_equity'],[],False,False
+ICICIPRULI.NS,False,,[],[],False,False
+IDEA.NS,False,,"['return_on_equity', 'debt_to_equity']",[],True,True
+IDFCFIRSTB.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity', 'total_debt']",[],False,False
+INDIGO.NS,False,,"['trailing_pe', 'return_on_equity']",[],False,False
+INDUSINDBK.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity']",[],False,False
+INDUSTOWER.NS,False,,[],[],False,False
+INFY.NS,False,,[],['ev_to_ebitda'],False,False
+IOB.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+IOC.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'return_on_equity']",[],False,False
+IPCALAB.NS,False,,['return_on_equity'],[],False,False
+IRCON.NS,False,,['return_on_equity'],[],False,False
+IRCTC.NS,False,,['return_on_equity'],[],False,False
+IRFC.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+ITC.NS,False,,['return_on_equity'],[],False,False
+JINDALSTEL.NS,False,,['return_on_equity'],[],False,False
+JKCEMENT.NS,False,,['return_on_equity'],[],False,False
+JSL.NS,False,,['return_on_equity'],[],False,False
+JSWSTEEL.NS,False,,['return_on_equity'],[],False,False
+JUBLFOOD.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'return_on_equity']",[],False,False
+KAJARIACER.NS,False,,['return_on_equity'],[],False,False
+KEI.NS,False,,['return_on_equity'],[],False,False
+KOTAKBANK.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity']",[],False,False
+KPITTECH.NS,False,,['return_on_equity'],[],False,False
+LALPATHLAB.NS,False,,['return_on_equity'],[],False,False
+LAURUSLABS.NS,False,,['return_on_equity'],[],False,False
+LICHSGFIN.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+LICI.NS,False,,['return_on_equity'],[],False,False
+LTIM.NS,True,"ingestion failed: yfinance returned an empty info payload for LTIM.NS (no exception, but no usable data — likely a transient Yahoo-side issue or an invalid/delisted symbol)",[],[],False,False
+LTTS.NS,False,,['return_on_equity'],[],False,False
+LT.NS,False,,['return_on_equity'],[],False,False
+LUPIN.NS,False,,['return_on_equity'],[],False,False
+M&M.NS,False,,['return_on_equity'],[],False,False
+MANAPPURAM.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+MARICO.NS,False,,['return_on_equity'],[],False,False
+MARUTI.NS,False,,['return_on_equity'],[],False,False
+MAZDOCK.NS,False,,['return_on_equity'],[],False,False
+METROPOLIS.NS,False,,['return_on_equity'],[],False,False
+MOTHERSON.NS,False,,['return_on_equity'],[],False,False
+MPHASIS.NS,False,,[],[],False,False
+MRF.NS,False,,['return_on_equity'],[],False,False
+MUTHOOTFIN.NS,False,,['ev_to_ebitda'],[],False,False
+NATIONALUM.NS,False,,['return_on_equity'],[],False,False
+NAVINFLUOR.NS,False,,['return_on_equity'],[],False,False
+NBCC.NS,False,,['return_on_equity'],[],False,False
+NCC.NS,False,,['return_on_equity'],[],False,False
+NESTLEIND.NS,False,,['return_on_equity'],[],False,False
+NMDC.NS,False,,['return_on_equity'],[],False,False
+NTPC.NS,False,,['return_on_equity'],[],False,False
+OBEROIRLTY.NS,False,,['return_on_equity'],[],False,False
+ONGC.NS,False,,['return_on_equity'],[],False,False
+PAGEIND.NS,False,,['return_on_equity'],[],False,False
+PERSISTENT.NS,False,,[],[],False,False
+PFC.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+PGHH.NS,False,,['return_on_equity'],[],False,False
+PHOENIXLTD.NS,False,,['return_on_equity'],[],False,False
+PIDILITIND.NS,False,,['return_on_equity'],[],False,False
+PIIND.NS,False,,['return_on_equity'],[],False,False
+PNB.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+POLYCAB.NS,False,,[],[],False,False
+POONAWALLA.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+POWERGRID.NS,False,,['return_on_equity'],[],False,False
+PRESTIGE.NS,False,,[],[],False,False
+PVRINOX.NS,False,,['return_on_equity'],[],False,False
+RAMCOCEM.NS,False,,['return_on_equity'],[],False,False
+RATNAMANI.NS,False,,['return_on_equity'],[],False,False
+RBLBANK.NS,False,,"['ev_to_ebitda', 'return_on_equity', 'debt_to_equity']",[],False,False
+RECLTD.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'ev_to_ebitda', 'return_on_equity']",[],False,False
+RELAXO.NS,False,,['return_on_equity'],[],False,False
+RELIANCE.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'return_on_equity']",[],False,False
+RVNL.NS,False,,['return_on_equity'],[],False,False
+SAIL.NS,False,,['return_on_equity'],[],False,False
+SBICARD.NS,False,,"['ev_to_ebitda', 'return_on_equity']",[],False,False
+SBILIFE.NS,False,,['debt_to_equity'],[],False,False
+SBIN.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+SHREECEM.NS,False,,['return_on_equity'],[],False,False
+SHRIRAMFIN.NS,False,,['ev_to_ebitda'],[],False,False
+SIEMENS.NS,False,,['return_on_equity'],[],False,False
+SKFINDIA.NS,False,,['return_on_equity'],[],False,False
+SOBHA.NS,False,,['return_on_equity'],[],False,False
+SRF.NS,False,,['return_on_equity'],[],False,False
+SUNDRMFAST.NS,False,,['return_on_equity'],[],False,False
+SUNPHARMA.NS,False,,['return_on_equity'],[],False,False
+SUPREMEIND.NS,False,,['return_on_equity'],[],False,False
+TATACHEM.NS,False,,"['trailing_pe', 'return_on_equity']",[],False,False
+TATACONSUM.NS,False,,['return_on_equity'],[],False,False
+TATAELXSI.NS,False,,['return_on_equity'],[],False,False
+TATAPOWER.NS,False,,['return_on_equity'],[],False,False
+TATASTEEL.NS,False,,['return_on_equity'],[],False,False
+TCS.NS,True,missing critical fields: ['market_cap'],['market_cap'],[],False,False
+TECHM.NS,False,,['return_on_equity'],[],False,False
+THERMAX.NS,False,,['return_on_equity'],[],False,False
+TIMKEN.NS,False,,['return_on_equity'],[],False,False
+TITAN.NS,False,,['return_on_equity'],[],False,False
+TMCV.NS,False,,['return_on_equity'],[],False,False
+TMPV.NS,False,,"['trailing_pe', 'return_on_equity']",[],False,False
+TORNTPHARM.NS,False,,['return_on_equity'],[],False,False
+TORNTPOWER.NS,False,,['return_on_equity'],[],False,False
+TRENT.NS,False,,['return_on_equity'],[],False,False
+TVSMOTOR.NS,True,missing critical fields: ['market_cap'],"['market_cap', 'return_on_equity']",[],False,False
+UCOBANK.NS,False,,"['ev_to_ebitda', 'debt_to_equity']",[],False,False
+ULTRACEMCO.NS,False,,['return_on_equity'],[],False,False
+UNIONBANK.NS,False,,"['ev_to_ebitda', 'debt_to_equity', 'revenue_growth', 'total_debt']",[],False,False
+UNITDSPR.NS,False,,['return_on_equity'],[],False,False
+UNOMINDA.NS,False,,['return_on_equity'],[],False,False
+UPL.NS,False,,['return_on_equity'],[],False,False
+VBL.NS,False,,[],[],False,False
+VEDL.NS,False,,['return_on_equity'],[],False,False
+VOLTAS.NS,False,,['return_on_equity'],[],False,False
+WELCORP.NS,False,,['return_on_equity'],[],False,False
+WHIRLPOOL.NS,False,,['return_on_equity'],[],False,False
+WIPRO.NS,False,,[],[],False,False
+ZEEL.NS,False,,['return_on_equity'],[],False,False
