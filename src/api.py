@@ -18,6 +18,7 @@ Usage:
 
 import logging
 import math
+import re
 import traceback
 from dataclasses import asdict
 from datetime import datetime
@@ -36,8 +37,33 @@ from src.acquisition_likelihood import score_acquisition_likelihood
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-DATA_DIR = "data/processed" if Path("data/processed/scored_universe.csv").exists() else str(sorted(Path(__file__).resolve().parent.parent.glob("snapshots/**/scored_universe.csv"))[-1].parent)
-WEB_DIR = str(Path(__file__).resolve().parent.parent / "web")
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def _run_number(csv: Path) -> int:
+    m = re.fullmatch(r"run-(\d+)", csv.relative_to(ROOT / "snapshots").parts[0])
+    return int(m.group(1)) if m else -1
+
+
+def _resolve_data_dir() -> Path:
+    """data/processed if present, else the newest committed snapshot. The
+    processed CSVs are gitignored, so on Render the snapshot is what gets
+    served. Newest is by run number, not string order (run-100 > run-99).
+    With neither, return data/processed anyway so endpoints 503 with an
+    actionable message instead of the import crashing into 502s."""
+    processed = ROOT / "data" / "processed"
+    if (processed / "scored_universe.csv").exists():
+        return processed
+    snaps = list(ROOT.glob("snapshots/run-*/**/scored_universe.csv"))
+    if not snaps:
+        logger.error("No scored_universe.csv in data/processed or snapshots/ — data endpoints will 503.")
+        return processed
+    return max(snaps, key=_run_number).parent
+
+
+DATA_DIR = str(_resolve_data_dir())
+logger.info(f"Serving data from {DATA_DIR}")
+WEB_DIR = str(ROOT / "web")
 
 app = FastAPI(title="M&A Screener API")
 

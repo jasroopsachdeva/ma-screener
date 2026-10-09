@@ -20,6 +20,7 @@ Usage (from the repo root):
 import argparse
 import glob
 import os
+import re
 
 import numpy as np
 import pandas as pd
@@ -28,14 +29,23 @@ import yfinance as yf
 # Repo root = parent of the directory holding this file, so the snapshot glob
 # resolves the same way whether you run from the root or from src/.
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SNAPSHOT_GLOB = os.path.join(REPO_ROOT, "snapshots", "**", "scored_universe.csv")
+SNAPSHOT_DIR = os.path.join(REPO_ROOT, "snapshots")
+SNAPSHOT_GLOB = os.path.join(SNAPSHOT_DIR, "**", "scored_universe.csv")
 BENCHMARK = "^NSEI"
+
+
+def _run_number(path):
+    """snapshots/run-NN/... -> NN. Sort on this, not the path string:
+    as text, run-100 sorts before run-99."""
+    m = re.fullmatch(r"run-(\d+)", os.path.relpath(path, SNAPSHOT_DIR).split(os.sep)[0])
+    return int(m.group(1)) if m else -1
 
 
 def load_snapshots():
     """Read every archived scored_universe.csv into one tidy frame."""
     frames = []
-    for path in sorted(glob.glob(SNAPSHOT_GLOB, recursive=True)):
+    paths = glob.glob(SNAPSHOT_GLOB, recursive=True)
+    for path in sorted(paths, key=lambda p: (_run_number(p), p)):
         try:
             df = pd.read_csv(path)
         except Exception as exc:
@@ -53,6 +63,7 @@ def load_snapshots():
     out = pd.concat(frames, ignore_index=True).dropna(subset=["as_of", "rank"])
     # Manual re-runs can produce two snapshots for one calendar day.
     # Keep one observation per (date, ticker) so those don't double-count.
+    # Runs are read oldest first, so this keeps the day's earliest run.
     return out.drop_duplicates(subset=["as_of", "ticker"], keep="first")
 
 
