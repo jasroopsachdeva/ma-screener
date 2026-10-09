@@ -557,7 +557,8 @@ def main():
         with st.container(border=True):
             st.subheader("Accretion / Dilution Simulator")
             st.caption(
-                "Simplified model: no tax step-up adjustments beyond the interest tax shield. "
+                "Simplified model: no tax step-up adjustments beyond the interest tax shield, and cash "
+                "not funded by new debt is assumed to come from existing reserves at no cost. "
                 "Enough to demonstrate deal mechanics, not a full model."
             )
 
