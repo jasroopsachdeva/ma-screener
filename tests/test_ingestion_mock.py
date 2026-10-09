@@ -39,6 +39,32 @@ def test_successful_fetch():
     print("PASS: successful fetch parses correctly")
 
 
+def test_statements_in_another_currency_are_converted():
+    """INFY.NS reports statements in USD but trades in INR: its equity and debt
+    must be converted to INR (or dropped if no FX quote), never mixed with an
+    INR market cap. asset_turnover is a same-currency ratio and stays as-is."""
+    import pandas as pd
+    from src.ingestion import _fx_rate
+
+    company = MagicMock()
+    company.info = {"marketCap": 6e12, "currentPrice": 1500.0, "returnOnEquity": 0.29,
+                    "totalDebt": 100.0, "currency": "INR", "financialCurrency": "USD"}
+    company.balance_sheet = pd.DataFrame({"2026": [1000.0]}, index=["Common Stock Equity"])
+    company.financials = pd.DataFrame({"2026": [500.0]}, index=["Total Revenue"])
+    fx, no_quote = MagicMock(), MagicMock()
+    fx.history.return_value = pd.DataFrame({"Close": [84.0, 85.0]})
+    no_quote.history.side_effect = Exception("no quote")
+
+    for quote, expected_equity, expected_debt in ((fx, 85_000.0, 8_500.0), (no_quote, None, None)):
+        _fx_rate.cache_clear()
+        with patch("src.ingestion.yf.Ticker", side_effect=lambda s: quote if s.endswith("=X") else company):
+            snap = fetch_ticker("INFY.NS")
+        assert snap.total_equity == expected_equity and snap.total_debt == expected_debt, (snap.total_equity, snap.total_debt)
+        assert snap.asset_turnover == 0.5, "revenue / equity is computed in the statement currency"
+    _fx_rate.cache_clear()
+    print("PASS: USD statements converted to INR at the FX close (85,000 equity), dropped when no quote exists")
+
+
 def test_config_validation_catches_duplicate_tickers():
     import tempfile, yaml
     from src.ingestion import load_config
@@ -156,4 +182,5 @@ if __name__ == "__main__":
     test_config_validation_catches_missing_ns_suffix()
     test_config_validation_catches_bad_weights()
     test_config_validation_passes_on_the_real_expanded_config()
+    test_statements_in_another_currency_are_converted()
     print("\nAll mock tests passed.")

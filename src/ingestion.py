@@ -16,6 +16,7 @@ import logging
 import time
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
 
 import yaml
@@ -102,6 +103,16 @@ def _is_cache_fresh(path: Path, expiry_days: int) -> bool:
     return age < timedelta(days=expiry_days)
 
 
+@lru_cache(maxsize=None)
+def _fx_rate(from_ccy: str, to_ccy: str) -> float | None:
+    """Latest close of e.g. USDINR=X, once per run; None if Yahoo has no quote."""
+    try:
+        close = yf.Ticker(f"{from_ccy}{to_ccy}=X").history(period="5d")["Close"].dropna()
+        return float(close.iloc[-1]) if len(close) else None
+    except Exception:
+        return None
+
+
 def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backoff_seconds: float = 2.0) -> TickerSnapshot:
     """Fetch a single ticker's snapshot. Never raises — returns fetch_ok=False on failure."""
     last_error = None
@@ -153,6 +164,16 @@ def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backo
                     asset_turnover = revenue / total_equity if total_equity else None
             except Exception:
                 pass
+
+            # Yahoo can report statements in another currency than the share
+            # price (INFY.NS: USD statements, INR price), which made its
+            # deal-model EPS ~95x too small. Ratios are unaffected, so only
+            # the absolute figures are converted — or dropped, never mixed.
+            fin_ccy, ccy = info.get("financialCurrency"), info.get("currency")
+            if fin_ccy and ccy and fin_ccy != ccy:
+                fx = _fx_rate(fin_ccy, ccy)
+                total_debt = total_debt * fx if fx and total_debt is not None else None
+                total_equity = total_equity * fx if fx and total_equity is not None else None
 
             return TickerSnapshot(
                 ticker=ticker,
