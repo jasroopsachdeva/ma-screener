@@ -197,6 +197,21 @@ def _company_fundamentals(df: pd.DataFrame, ticker: str, avg_price_days: int = 0
     }
 
 
+def check_target_size(df: pd.DataFrame, acquirer_ticker: str, target_ticker: str, max_target_size_pct: float = 1.0) -> None:
+    """The structural-plausibility rule find_best_targets applies, for a single
+    deal. The model pays the cash portion from existing reserves at no cost,
+    so a target bigger than the acquirer yields nonsense accretion (ABB.NS
+    buying the larger AXISBANK.NS showed +645%). Raises ValueError."""
+    caps = df.set_index("ticker")["market_cap"]
+    acquirer_cap, target_cap = caps.get(acquirer_ticker), caps.get(target_ticker)
+    if pd.notna(acquirer_cap) and pd.notna(target_cap) and acquirer_cap > 0 and target_cap / acquirer_cap > max_target_size_pct:
+        raise ValueError(
+            f"{target_ticker}'s market cap is {target_cap / acquirer_cap:.1f}x {acquirer_ticker}'s. This simplified "
+            f"model pays the cash portion from existing reserves, so it can't value a target larger than "
+            f"{max_target_size_pct:.0%} of the acquirer (Best Targets excludes these too). Pick a smaller target."
+        )
+
+
 def run_deal(df: pd.DataFrame, deal: DealInputs) -> DealResult:
     acquirer = _company_fundamentals(df, deal.acquirer_ticker, avg_price_days=deal.avg_price_days)
     target = _company_fundamentals(df, deal.target_ticker, avg_price_days=deal.avg_price_days)

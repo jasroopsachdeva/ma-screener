@@ -384,7 +384,13 @@ async function initDealSimulator() {
         const options = tickers.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
         qs("#deal-acquirer").innerHTML = options;
         qs("#deal-target").innerHTML = options;
-        if (tickers.length > 1) qs("#deal-target").value = tickers[1];
+        // A plausible example pair (same sector, target ~10% of the acquirer's size)
+        // instead of alphabetical order, which opened on ABB.NS buying the larger
+        // AXISBANK.NS at +645%. Falls back to the first two tickers.
+        const pair = ["TCS.NS", "COFORGE.NS"];
+        const [acquirer, target] = pair.every(t => tickers.includes(t)) ? pair : tickers;
+        if (acquirer) qs("#deal-acquirer").value = acquirer;
+        if (target) qs("#deal-target").value = target;
 
         bindSliderDisplay("deal-premium", "deal-premium-value", "%");
         bindSliderDisplay("deal-cash", "deal-cash-value", "%");

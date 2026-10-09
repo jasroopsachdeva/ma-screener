@@ -35,7 +35,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from src.accretion_dilution import DealInputs, run_deal, find_optimal_terms, find_best_targets, project_multi_year_accretion
+from src.accretion_dilution import DealInputs, check_target_size, run_deal, find_optimal_terms, find_best_targets, project_multi_year_accretion
 
 st.set_page_config(page_title="M&A Screener", layout="wide", page_icon="◆")
 
@@ -589,6 +589,7 @@ def main():
                 st.warning("Acquirer and target must be different companies.")
             else:
                 try:
+                    check_target_size(scored, acquirer, target)
                     deal = DealInputs(
                         acquirer, target, premium, cash_pct,
                         debt_funded_pct=debt_funded_pct, interest_rate=interest_rate, tax_rate=tax_rate,

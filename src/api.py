@@ -31,7 +31,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from src.accretion_dilution import DealInputs, run_deal, find_optimal_terms, find_best_targets, project_multi_year_accretion
+from src.accretion_dilution import DealInputs, check_target_size, run_deal, find_optimal_terms, find_best_targets, project_multi_year_accretion
 from src.acquisition_likelihood import score_acquisition_likelihood
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -213,8 +213,10 @@ class DealRequest(BaseModel):
 
 
 def _build_deal(df: pd.DataFrame, req: DealRequest) -> DealInputs:
+    """Validates the pair for every single-deal endpoint; ValueError -> 400."""
     if req.acquirer == req.target:
         raise HTTPException(400, "Acquirer and target must be different companies.")
+    check_target_size(df, req.acquirer, req.target)
     return DealInputs(
         req.acquirer, req.target, req.premium_pct, req.cash_pct,
         debt_funded_pct=req.debt_funded_pct, interest_rate=req.interest_rate, tax_rate=req.tax_rate,
@@ -248,8 +250,7 @@ def post_multi_year(req: DealRequest, years: int = 3):
 def post_heatmap(req: DealRequest):
     df = _load_scored()
     try:
-        if req.acquirer == req.target:
-            raise HTTPException(400, "Acquirer and target must be different companies.")
+        _build_deal(df, req)
         optimal = find_optimal_terms(
             df, req.acquirer, req.target,
             debt_funded_pct=req.debt_funded_pct, interest_rate=req.interest_rate, tax_rate=req.tax_rate,
