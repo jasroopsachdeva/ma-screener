@@ -55,8 +55,11 @@ a { color: var(--accent); text-decoration: none; }
     align-items: center;
     justify-content: space-between;
     padding: 16px 32px;
-    background-color: rgba(244, 245, 251, 0.92);
-    backdrop-filter: blur(8px);
+    background-color: rgba(244, 245, 251, 0.98);
+    /* backdrop-filter removed: it created a stacking context that trapped
+       .tools-menu inside #navbar, so page content painted over the dropdown
+       regardless of z-index. Background is already 0.92 alpha, so the blur
+       was contributing almost nothing visually. */
     border-bottom: 1px solid var(--border);
 }
 .nav-left { display: flex; align-items: center; gap: 28px; }
@@ -384,3 +387,23 @@ footer {
     .control-row { flex-direction: column; }
     .tools-menu { width: 300px; }
 }
+
+
+/* ---- Dropdown opacity + layering override ----
+   Page content was painting through the tools dropdown. Two causes fixed
+   together: an opaque background (var(--bg-card) may carry alpha), and a
+   z-index high enough to clear anything on the page below the navbar. */
+.tools-wrap { position: relative; z-index: 1000; }
+.tools-menu {
+    background-color: #ffffff;
+    z-index: 1000;
+    box-shadow: 0 12px 32px rgba(28, 29, 46, 0.18);
+}
+
+/* ---- Dropdown overflow fix ----
+   Description text was rendering wider than the 360px panel and spilling
+   past its right edge, colliding with page text behind it. Wider panel +
+   min-width:0 on all descendants so flex children can shrink and wrap. */
+.tools-menu { width: 440px; max-width: calc(100vw - 32px); box-sizing: border-box; overflow: hidden; }
+.tools-menu * { min-width: 0; }
+.tool-desc, .tool-title { white-space: normal; overflow-wrap: break-word; }
