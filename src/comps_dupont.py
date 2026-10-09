@@ -99,6 +99,13 @@ def compute_dupont(df: pd.DataFrame) -> pd.DataFrame:
         dupont["equity_multiplier"] = float("nan")
         logger.warning("total_debt/total_equity not found in scored data — equity multiplier unavailable")
 
+    # ingestion stores asset_turnover as revenue / EQUITY, so net_margin x
+    # asset_turnover is already ROE. Re-base turnover on capital (debt +
+    # equity) so the three factors multiply back to ROE; multiplying the
+    # equity-based figure by the equity multiplier counted leverage twice
+    # (median 2.9pp off reported ROE on the Jul 2026 snapshots, vs 1.0pp).
+    dupont["asset_turnover"] = dupont["asset_turnover"] / dupont["equity_multiplier"]
+
     # dupont_implied_roe only needs the three DuPont inputs — it should
     # compute even when reported ROE is missing (e.g. SHREECEM.NS, where
     # yfinance never returned a return_on_equity value at all). This is
@@ -124,7 +131,12 @@ def compute_dupont(df: pd.DataFrame) -> pd.DataFrame:
     # needs reported ROE to exist, since it's cross-checking implied vs
     # reported. A missing reported ROE means "no gap to check" (NaN),
     # not "can't compute implied ROE" — those are different questions.
-    can_check_gap = can_compute_implied & dupont["return_on_equity"].notna()
+    # A ROE that cleaning derived from these same inputs is not "reported":
+    # the gap would be zero by construction, so it isn't checked.
+    reported = dupont["return_on_equity"].notna()
+    if "roe_derived" in dupont.columns:
+        reported &= ~dupont["roe_derived"].eq(True)
+    can_check_gap = can_compute_implied & reported
     raw_gap = dupont["dupont_implied_roe"] - dupont["return_on_equity"]
     dupont["dupont_vs_reported_roe_gap"] = raw_gap.where(can_check_gap)
 
