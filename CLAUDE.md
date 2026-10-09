@@ -49,20 +49,62 @@ would silently push incomplete rows to the top of the ranking.
 `trailing_pe` was deliberately demoted from this list — treating it as critical
 dropped four otherwise-scoreable companies every run. Do not add it back.
 
-**Only one backtest is legitimate.**
-`validate_forward_performance()` reads snapshots recorded in the past and measures
-real price performance from that date forward. No look-ahead. It correctly reports
-"insufficient history" until enough time has passed — that is not a bug to fix.
+**ROE is partly derived, and `asset_turnover` is revenue / equity.**
+Yahoo stopped returning `returnOnEquity` for most NSE tickers in Aug 2026
+(95% coverage on Jul 9, 17% from Aug 18). `cleaning.py` fills only the missing
+ones as `net_margin × asset_turnover`, flagged `roe_derived`; where both exist it
+is within ~1pp of reported ROE (median). Ingestion computes `asset_turnover` as
+revenue / **equity**, so that product already is ROE — never multiply it by an
+equity multiplier as well (`comps_dupont` did until Oct 2026, doubling ROE at
+D/E = 1). Snapshots from Aug 18, 2026 until this fix shipped have ROE for ~17%
+of rows and later ones ~98%, so any series across that boundary mixes two input
+regimes.
+
+**Statements can be in a different currency than the share price.** For
+INFY.NS and HCLTECH.NS Yahoo sets `financialCurrency=USD` while they trade in
+INR, but it is inconsistent about which figures it converted: INFY's balance
+sheet is USD, HCLTECH's is INR, and both report `totalDebt` in USD. So ingestion
+does not convert by FX (that inflated HCLTECH's equity ~97x); it rebuilds
+`total_equity` (book value per share × shares) and `total_debt` (debt-to-equity
+× equity) from trading-currency fields. Ratios are currency-free. Snapshots
+made before this fix carry INFY's equity, and both companies' debt, in USD.
+
+**Snapshots are ordered by run number, never by path string.** As text,
+`run-100` sorts before `run-99`. `api.py` and `validate_returns.py` both rely on
+numeric order (`_run_number`).
+
+**The deal model can't value a target larger than the acquirer.** It pays the
+cash portion from existing reserves at no cost, so a bigger target gives
+nonsense accretion (ABB buying the larger Axis Bank showed +645%).
+`check_target_size()` rejects these on every single-deal path; `find_best_targets`
+excludes them via `max_target_size_pct`.
+
+**Only forward backtests are legitimate.**
+`validate_forward_performance()` (`backtest.py`) and `src/validate_returns.py`
+rank on what was recorded on a past date and measure price performance from that
+date forward. No look-ahead. `validate_forward_performance()` checks one date
+only — the oldest eligible top-10 in `data/history/shortlist_history.csv`, which
+is frozen at Jul 4, 6, 7 and Aug 5, 2026 (see the .gitignore section) — against
+today, with no benchmark: a sanity check. `validate_returns.py` reads every
+committed daily snapshot and is the benchmark-adjusted, multi-date test that
+accumulates. Yahoo can return the latest day's close as NaN; drop NaNs before
+taking first/last prices (one NaN turned every backtest average into NaN).
 
 `compute_trailing_performance()` ranks on *today's* fundamentals and then checks
 *past* price performance. It is structurally biased and informational only. Never
 present its output as validation.
 
-Current honest finding, from `src/validate_returns.py`: a benchmark-adjusted
-full-universe decile backtest shows **no statistically detectable signal**
-(top-minus-bottom ≈ −0.97%, 95% CI [−1.28, −0.63], spread positive in 0 of 7
-windows, and the windows overlap heavily). Do not retune scoring weights to make
-this number look better and then call it validated.
+Current honest finding, from `src/validate_returns.py` (defaults, run
+2026-10-10 over snapshots dated Jul 9 – Sep 10): a benchmark-adjusted
+full-universe decile backtest shows top-minus-bottom ≈ **+1.13%**, 95% CI
+[+0.80, +1.45], spread positive in 50 of 64 windows. That is **still not a
+statistically detectable signal**. The 64 windows are daily and overlap heavily,
+leaving only 3 independent 30-day windows (the script's `non-overlapping windows`
+line: −0.75%, +2.91%, +2.39%), so the CI is far too narrow. The scoring inputs also changed mid-sample (see ROE above).
+The earlier figure (−0.97%, CI [−1.28, −0.63], 0 of 7 windows, computed Aug 5
+from Jul 9–15 only) was equally inconclusive; the sign flip shows how unstable
+this is. Do not retune scoring weights to make this number look better and then
+call it validated.
 
 **Acquisition likelihood uses an inverted lens** — cheap, low-leverage, weak
 quality reads as a value target. Scores that look "bad" on quality are intentional.
@@ -80,13 +122,16 @@ Consequences to respect:
   `git add -f`, plus an explicit failure when nothing is staged. Keep both.
 - `logs/` is anchored as `/logs/` so snapshot run logs are not ignored at depth.
   A bare `logs/` pattern matches at any depth and re-breaks this.
-- `src/api.py` falls back to the newest committed snapshot when
-  `data/processed/scored_universe.csv` is absent. This is what keeps the Render
-  deploy from serving 503s on every endpoint, since the processed CSVs are
-  gitignored and never reach GitHub. Do not "clean up" this fallback.
-- `data/history/*.csv` is still gitignored and local-only. It holds the longest
-  series (top-10 records only) and does not accumulate in CI, since runners are
-  ephemeral.
+- `src/api.py` serves whichever of `data/processed/` and the newest committed
+  snapshot has the newer `fetched_at`. On Render only snapshots exist, since the
+  processed CSVs are gitignored and never reach GitHub; this is what keeps the
+  deploy from serving 503s on every endpoint. Do not "clean up" this fallback.
+  Nothing in the API may read `data/processed/` by a CWD-relative path: it works
+  locally and fails on Render (the PDF endpoint did exactly this).
+- `data/history/*.csv` is matched by `.gitignore`, but an Aug 5, 2026 archive of
+  both files is force-committed and tracked (40 top-10 records, 4 dates). CI's
+  appends are discarded with the runner, so it only grows if someone runs the
+  pipeline locally and commits it. Check `git status` for these after a local run.
 
 ## CI
 
@@ -94,6 +139,18 @@ Consequences to respect:
 GitHub queueing usually delays it to ~11:10–11:50 IST). `workflow_dispatch` is
 enabled. Python 3.11, `timeout-minutes: 45`. A separate workflow runs the test
 suite on every push.
+
+Both workflows pin `runs-on: ubuntu-24.04`, because `ubuntu-latest` moves to
+Ubuntu 26 from 2026-10-19; bump it deliberately. Their actions (checkout@v4,
+setup-python@v5, cache@v4, upload-artifact@v4) target Node 20 and GitHub
+force-runs them on Node 24, which works. Bump majors deliberately too, and
+verify with a manual pipeline run.
+
+The test workflow runs each `tests/test_*.py` as a plain script
+(`python "$f"`), **not pytest**. Every test file inserts the repo root into
+`sys.path` and calls its tests from a `__main__` block; pytest fixtures
+(`tmp_path`, `monkeypatch`) don't exist there, so use `tempfile` and
+`unittest.mock.patch`. A file that passes under pytest can still fail CI.
 
 Transient yfinance rate-limit dropouts cost a handful of large-cap rows on some
 runs. A run with fewer rows than usual is normal variance, not necessarily a bug.
@@ -106,6 +163,12 @@ Render free tier, auto-deploying `src/api.py` from GitHub on push to main.
 - A failed *build* leaves the previous deploy up; a successful build that crashes
   at *runtime* serves 502s. Always run `python -m src.api` locally before pushing.
 - Free tier spins down when idle; first request after that takes 30–60s.
+- To see which data is live: `/api/hero-stats` → `updated` is the data's fetch
+  time (UTC, from `fetched_at`), and the startup log line
+  `Serving data from …/snapshots/run-NN` names the snapshot.
+- Every response sends `Cache-Control: no-cache`, so browsers revalidate
+  `app.js` after a deploy instead of running stale frontend code against the
+  new API.
 
 ## Working agreement
 

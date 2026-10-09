@@ -56,11 +56,16 @@ def fetch_price_return(ticker: str, start_date: str = None, lookback_days: int =
         else:
             hist = yf.Ticker(ticker).history(period=f"{lookback_days}d")
 
-        if hist is None or hist.empty or "Close" not in hist.columns or len(hist) < 2:
+        if hist is None or hist.empty or "Close" not in hist.columns:
+            return None
+        # Yahoo can return the latest day with a NaN close (TCS.NS on
+        # 2026-10-09); one NaN made every average print "+nan%".
+        close = hist["Close"].dropna()
+        if len(close) < 2:
             return None
 
-        start_price = hist["Close"].iloc[0]
-        end_price = hist["Close"].iloc[-1]
+        start_price = close.iloc[0]
+        end_price = close.iloc[-1]
         if start_price <= 0:
             return None
         return (end_price - start_price) / start_price

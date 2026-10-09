@@ -39,6 +39,34 @@ def test_successful_fetch():
     print("PASS: successful fetch parses correctly")
 
 
+def test_statements_in_another_currency_are_rebuilt_in_trading_currency():
+    """Yahoo labels INFY.NS and HCLTECH.NS financials USD while they trade in
+    INR, but only INFY's balance sheet is actually USD (both report totalDebt
+    in USD). Equity and debt are rebuilt from trading-currency fields (book
+    value per share x shares, debt-to-equity), so both come out in INR, and
+    asset_turnover stays a same-currency statement ratio."""
+    import pandas as pd
+
+    for statement_equity in (10.0, 900.0):  # INFY-like (USD) and HCLTECH-like (INR) balance sheet
+        company = MagicMock()
+        company.info = {"marketCap": 6e12, "currentPrice": 1500.0, "returnOnEquity": 0.29, "totalDebt": 1.0,
+                        "currency": "INR", "financialCurrency": "USD",
+                        "bookValue": 225.0, "sharesOutstanding": 4.0, "debtToEquity": 8.0}
+        company.balance_sheet = pd.DataFrame({"2026": [statement_equity]}, index=["Common Stock Equity"])
+        company.financials = pd.DataFrame({"2026": [2 * statement_equity]}, index=["Total Revenue"])
+        with patch("src.ingestion.yf.Ticker", return_value=company):
+            snap = fetch_ticker("INFY.NS")
+        assert snap.total_equity == 900.0, f"225 x 4 in INR either way, got {snap.total_equity}"
+        assert abs(snap.total_debt - 72.0) < 1e-9, f"8% of equity, got {snap.total_debt}"
+        assert snap.asset_turnover == 2.0, "revenue / equity is a statement-currency ratio"
+
+    company.info.pop("bookValue")
+    with patch("src.ingestion.yf.Ticker", return_value=company):
+        snap = fetch_ticker("INFY.NS")
+    assert snap.total_equity is None and snap.total_debt is None, "no trading-currency equity: drop, never mix"
+    print("PASS: equity/debt rebuilt in the trading currency for USD- and INR-balance-sheet cases; dropped if unavailable")
+
+
 def test_config_validation_catches_duplicate_tickers():
     import tempfile, yaml
     from src.ingestion import load_config
@@ -156,4 +184,5 @@ if __name__ == "__main__":
     test_config_validation_catches_missing_ns_suffix()
     test_config_validation_catches_bad_weights()
     test_config_validation_passes_on_the_real_expanded_config()
+    test_statements_in_another_currency_are_rebuilt_in_trading_currency()
     print("\nAll mock tests passed.")

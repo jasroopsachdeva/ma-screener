@@ -20,6 +20,7 @@ Usage (from the repo root):
 import argparse
 import glob
 import os
+import re
 
 import numpy as np
 import pandas as pd
@@ -28,14 +29,23 @@ import yfinance as yf
 # Repo root = parent of the directory holding this file, so the snapshot glob
 # resolves the same way whether you run from the root or from src/.
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SNAPSHOT_GLOB = os.path.join(REPO_ROOT, "snapshots", "**", "scored_universe.csv")
+SNAPSHOT_DIR = os.path.join(REPO_ROOT, "snapshots")
+SNAPSHOT_GLOB = os.path.join(SNAPSHOT_DIR, "**", "scored_universe.csv")
 BENCHMARK = "^NSEI"
+
+
+def _run_number(path):
+    """snapshots/run-NN/... -> NN. Sort on this, not the path string:
+    as text, run-100 sorts before run-99."""
+    m = re.fullmatch(r"run-(\d+)", os.path.relpath(path, SNAPSHOT_DIR).split(os.sep)[0])
+    return int(m.group(1)) if m else -1
 
 
 def load_snapshots():
     """Read every archived scored_universe.csv into one tidy frame."""
     frames = []
-    for path in sorted(glob.glob(SNAPSHOT_GLOB, recursive=True)):
+    paths = glob.glob(SNAPSHOT_GLOB, recursive=True)
+    for path in sorted(paths, key=lambda p: (_run_number(p), p)):
         try:
             df = pd.read_csv(path)
         except Exception as exc:
@@ -53,6 +63,7 @@ def load_snapshots():
     out = pd.concat(frames, ignore_index=True).dropna(subset=["as_of", "rank"])
     # Manual re-runs can produce two snapshots for one calendar day.
     # Keep one observation per (date, ticker) so those don't double-count.
+    # Runs are read oldest first, so this keeps the day's earliest run.
     return out.drop_duplicates(subset=["as_of", "ticker"], keep="first")
 
 
@@ -121,6 +132,18 @@ def jackknife(values):
     loo = np.array([np.delete(x, i).mean() for i in range(len(x))])
     worst = int(np.argmax(np.abs(loo - x.mean())))
     return worst, loo[worst]
+
+
+def non_overlapping(as_of_dates, horizon_days):
+    """Indices of the windows that start at least horizon_days apart, taken
+    greedily from the first. Daily as-of dates make heavily overlapping
+    windows; only these are independent observations."""
+    keep, last = [], None
+    for i, d in enumerate(as_of_dates):
+        if last is None or (d - last).days >= horizon_days:
+            keep.append(i)
+            last = d
+    return keep
 
 
 def main():
@@ -213,6 +236,9 @@ def main():
     print(f"mean top-minus-bottom    : {agg['spread'].mean():+.2f}%  "
           f"95% CI [{lo:+.2f}, {hi:+.2f}]")
     print(f"spread positive in       : {wins}/{len(agg)} windows")
+    indep = agg["spread"].iloc[non_overlapping(agg["as_of"], horizon)]
+    print(f"non-overlapping windows  : {len(indep)} -> {', '.join(f'{s:+.2f}%' for s in indep)}"
+          f"  (positive in {int((indep > 0).sum())}/{len(indep)})")
     print()
     print("NOTE: overlapping windows from daily snapshots are NOT independent.")
     print("Treat the CI as indicative only; it understates true uncertainty.")

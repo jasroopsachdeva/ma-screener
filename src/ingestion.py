@@ -154,6 +154,18 @@ def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backo
             except Exception:
                 pass
 
+            # When Yahoo's financialCurrency differs from the trading currency,
+            # it is inconsistent about which figures it converted: INFY.NS's
+            # balance sheet is in USD but HCLTECH.NS's is in INR, while both
+            # report totalDebt in USD. Mixing them made INFY's deal-model EPS
+            # ~95x too small (and an FX conversion would inflate HCLTECH ~97x).
+            # Rebuild the absolute figures from fields quoted in the trading
+            # currency instead; the statement ratios are unaffected.
+            if info.get("financialCurrency") not in (None, info.get("currency")):
+                book_value, shares, de = info.get("bookValue"), info.get("sharesOutstanding"), info.get("debtToEquity")
+                total_equity = book_value * shares if book_value and shares else None
+                total_debt = de / 100 * total_equity if de is not None and total_equity else None
+
             return TickerSnapshot(
                 ticker=ticker,
                 sector=sector,
