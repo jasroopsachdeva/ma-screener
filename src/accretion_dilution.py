@@ -648,6 +648,11 @@ if __name__ == "__main__":
 
     if not args.best_targets and not args.target:
         raise SystemExit("--target is required unless --best-targets is set")
+    if not args.best_targets:
+        try:
+            check_target_size(df, args.acquirer, args.target)
+        except ValueError as e:
+            raise SystemExit(str(e))
 
     if args.multi_year:
         deal = DealInputs(args.acquirer, args.target, args.premium, args.cash_pct,

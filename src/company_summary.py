@@ -54,8 +54,10 @@ def _sector_peers(ticker: str, scored: pd.DataFrame, n: int = 4) -> list:
 def _illustrative_deal(ticker: str, scored: pd.DataFrame) -> dict | None:
     """A real accretion/dilution calculation (using the same tested
     run_deal engine as the interactive simulator) with this company as
-    the TARGET and the top-ranked company in its own sector as an
-    illustrative acquirer, at standard terms (25% premium, 50/50
+    the TARGET and the top-ranked company in its own sector that is at
+    least its size as an illustrative acquirer (the simulator's size
+    rule: a smaller acquirer gave IOB.NS "buying" HDFCBANK.NS, 18.5x its
+    size, at +55%), at standard terms (25% premium, 50/50
     cash-stock, no debt financing or synergies). Purely illustrative —
     not a real deal recommendation, just a concrete "what would a
     plausible in-sector acquisition of this company look like" data
@@ -64,7 +66,7 @@ def _illustrative_deal(ticker: str, scored: pd.DataFrame) -> dict | None:
 
     Returns None gracefully if there's no viable peer or either company
     is missing required data — this is a bonus section, not core."""
-    from src.accretion_dilution import DealInputs, run_deal
+    from src.accretion_dilution import DealInputs, check_target_size, run_deal
 
     row = scored[scored["ticker"] == ticker]
     if row.empty or "sector" not in scored.columns:
@@ -77,6 +79,7 @@ def _illustrative_deal(ticker: str, scored: pd.DataFrame) -> dict | None:
     for _, peer_row in peers.iterrows():
         acquirer_ticker = peer_row["ticker"]
         try:
+            check_target_size(scored, acquirer_ticker, ticker)
             deal = DealInputs(acquirer_ticker, ticker, premium_pct=0.25, cash_pct=0.5)
             result = run_deal(scored, deal)
             return {
@@ -321,7 +324,7 @@ def generate_summary_pdf(ticker: str, output_path: str, **data_kwargs) -> str:
             f"Every other section on this page is about {data['ticker']} itself. This one asks a "
             f"different question: <b>if {data['ticker']} were ACQUIRED, what would that do to the "
             f"acquirer?</b> — a standard way of gauging how attractive a company is as a target. "
-            f"Using {data['ticker']}'s top-ranked in-sector peer, <b>{deal['acquirer']}</b>, as an "
+            f"Using {data['ticker']}'s top-ranked in-sector peer of at least its size, <b>{deal['acquirer']}</b>, as an "
             f"illustrative acquirer (25% premium, 50% cash / 50% stock, no synergies or debt financing), "
             f"the numbers below are <b>{deal['acquirer']}'s own EPS</b> before and after the hypothetical "
             f"deal — not {data['ticker']}'s. Purely illustrative, not a real deal recommendation.",
