@@ -21,7 +21,6 @@ import math
 import re
 import traceback
 from dataclasses import asdict
-from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -45,20 +44,38 @@ def _run_number(csv: Path) -> int:
     return int(m.group(1)) if m else -1
 
 
+def _latest_fetch(df: pd.DataFrame) -> pd.Timestamp:
+    """When the data was fetched (newest fetched_at), NaT if unknown."""
+    if "fetched_at" not in df.columns:
+        return pd.NaT
+    return pd.to_datetime(df["fetched_at"], utc=True, errors="coerce").max()
+
+
+def _csv_fetch_time(csv: Path) -> pd.Timestamp:
+    try:
+        return _latest_fetch(pd.read_csv(csv, usecols=["fetched_at"]))
+    except (ValueError, OSError):
+        return pd.NaT
+
+
 def _resolve_data_dir() -> Path:
-    """data/processed if present, else the newest committed snapshot. The
-    processed CSVs are gitignored, so on Render the snapshot is what gets
-    served. Newest is by run number, not string order (run-100 > run-99).
-    With neither, return data/processed anyway so endpoints 503 with an
-    actionable message instead of the import crashing into 502s."""
+    """Whichever holds newer data: data/processed (a local pipeline run) or
+    the newest committed snapshot. On Render only snapshots exist, since the
+    processed CSVs are gitignored; locally a stale data/processed used to
+    mask fresher snapshots. Newest snapshot is by run number, not string
+    order (run-100 > run-99). With neither, return data/processed anyway so
+    endpoints 503 with an actionable message instead of the import crashing
+    into 502s."""
     processed = ROOT / "data" / "processed"
-    if (processed / "scored_universe.csv").exists():
-        return processed
+    candidates = [csv for csv in [processed / "scored_universe.csv"] if csv.exists()]
     snaps = list(ROOT.glob("snapshots/run-*/**/scored_universe.csv"))
-    if not snaps:
+    if snaps:
+        candidates.append(max(snaps, key=_run_number))
+    if not candidates:
         logger.error("No scored_universe.csv in data/processed or snapshots/ — data endpoints will 503.")
         return processed
-    return max(snaps, key=_run_number).parent
+    # Ties and unreadable fetch times keep data/processed, which is listed first.
+    return max(candidates, key=_csv_fetch_time).parent
 
 
 DATA_DIR = str(_resolve_data_dir())
@@ -66,6 +83,16 @@ logger.info(f"Serving data from {DATA_DIR}")
 WEB_DIR = str(ROOT / "web")
 
 app = FastAPI(title="M&A Screener API")
+
+
+@app.middleware("http")
+async def revalidate_every_response(request: Request, call_next):
+    """Without a Cache-Control header, browsers cache app.js heuristically
+    and keep running the old frontend against a newly deployed API.
+    no-cache still caches, but revalidates (a cheap 304 via ETag)."""
+    response = await call_next(request)
+    response.headers.setdefault("Cache-Control", "no-cache")
+    return response
 
 
 @app.exception_handler(Exception)
@@ -119,11 +146,10 @@ def _safe_read(path: str) -> Optional[pd.DataFrame]:
 def get_hero_stats():
     df = _load_scored()
     top = df.sort_values("rank").iloc[0] if "rank" in df.columns and not df.empty else None
-    path = f"{DATA_DIR}/scored_universe.csv"
-    try:
-        updated = datetime.fromtimestamp(Path(path).stat().st_mtime).strftime("%b %d, %H:%M")
-    except OSError:
-        updated = "—"
+    # The data's own fetch time, not the CSV's mtime: on Render the mtime is
+    # the deploy's checkout time, which looks fresh even when the data isn't.
+    fetched = _latest_fetch(df)
+    updated = fetched.strftime("%b %d, %H:%M UTC") if pd.notna(fetched) else "—"
     avg_score = df["composite_score"].mean() if "composite_score" in df.columns else None
     return {
         "universe": len(df),
@@ -310,6 +336,8 @@ def get_summary_pdf(ticker: str):
         return FileResponse(out_path, media_type="application/pdf", filename=f"summary_{ticker.replace('.', '_')}.pdf")
     except ValueError as e:
         raise HTTPException(400, str(e))
+    except FileNotFoundError as e:
+        raise HTTPException(503, f"No scored data to build a summary from — run `python -m src.run_pipeline` first. ({e})")
 
 
 # Serve the frontend LAST — this mount catches all remaining paths, so it

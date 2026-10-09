@@ -1,7 +1,8 @@
 """
 Data-location rules that only break on Render: snapshots are ordered by run
-number (as text, run-100 sorts before run-99), and nothing may read
-data/processed relative to the CWD (it is gitignored, so absent there).
+number (as text, run-100 sorts before run-99), nothing may read
+data/processed relative to the CWD (it is gitignored, so absent there), and
+freshness is judged by the data's own fetched_at, never by file mtimes.
 """
 
 import os
@@ -40,6 +41,25 @@ def test_api_without_any_data_falls_back_to_processed():
     print("PASS: no data at all -> data/processed, so endpoints 503 instead of the import crashing")
 
 
+def test_api_serves_newer_of_processed_and_snapshot():
+    # A stale local data/processed (Aug 5) used to mask a fresher snapshot (Oct 9).
+    def scored(day):
+        return f"ticker,fetched_at\nX.NS,2026-{day}T05:00:00+00:00\n"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        snap = _snap(tmp, "96", scored("10-09"))
+        processed = Path(tmp) / "data" / "processed"
+        processed.mkdir(parents=True)
+        with patch.object(api, "ROOT", Path(tmp)):
+            (processed / "scored_universe.csv").write_text(scored("08-05"))
+            assert api._resolve_data_dir() == snap, "stale local data must not mask a newer snapshot"
+            (processed / "scored_universe.csv").write_text(scored("10-10"))
+            assert api._resolve_data_dir() == processed, "a fresh local pipeline run should win"
+        with patch.object(api, "DATA_DIR", str(processed)):
+            assert api.get_hero_stats()["updated"] == "Oct 10, 05:00 UTC", "updated must come from fetched_at"
+    print("PASS: newer of data/processed and the latest snapshot is served; 'updated' comes from fetched_at")
+
+
 def test_backtest_keeps_earliest_run_of_a_day():
     # Same-day re-run: run-99 then run-100. The dedup keeps the first one read.
     with tempfile.TemporaryDirectory() as tmp:
@@ -67,6 +87,7 @@ def test_summary_pdf_reads_data_dir_not_cwd():
 if __name__ == "__main__":
     test_api_serves_highest_run_number()
     test_api_without_any_data_falls_back_to_processed()
+    test_api_serves_newer_of_processed_and_snapshot()
     test_backtest_keeps_earliest_run_of_a_day()
     test_summary_pdf_reads_data_dir_not_cwd()
     print("\nAll snapshot-order / data-path tests passed.")
