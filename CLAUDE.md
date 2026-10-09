@@ -60,12 +60,14 @@ D/E = 1). Snapshots from Aug 18, 2026 until this fix shipped have ROE for ~17%
 of rows and later ones ~98%, so any series across that boundary mixes two input
 regimes.
 
-**Statements can be in a different currency than the share price.** Yahoo
-reports INFY.NS's statements in USD while it trades in INR, which made its
-deal-model EPS ~95x too small. Ingestion converts `total_equity` and
-`total_debt` at the FX close (or drops them if there is no quote), so absolute
-figures are never mixed; ratios are currency-free. Snapshots made before this
-fix carry INFY's equity and debt in USD.
+**Statements can be in a different currency than the share price.** For
+INFY.NS and HCLTECH.NS Yahoo sets `financialCurrency=USD` while they trade in
+INR, but it is inconsistent about which figures it converted: INFY's balance
+sheet is USD, HCLTECH's is INR, and both report `totalDebt` in USD. So ingestion
+does not convert by FX (that inflated HCLTECH's equity ~97x); it rebuilds
+`total_equity` (book value per share × shares) and `total_debt` (debt-to-equity
+× equity) from trading-currency fields. Ratios are currency-free. Snapshots
+made before this fix carry INFY's equity, and both companies' debt, in USD.
 
 **Snapshots are ordered by run number, never by path string.** As text,
 `run-100` sorts before `run-99`. `api.py` and `validate_returns.py` both rely on
@@ -85,7 +87,8 @@ only — the oldest eligible top-10 in `data/history/shortlist_history.csv`, whi
 is frozen at Jul 4, 6, 7 and Aug 5, 2026 (see the .gitignore section) — against
 today, with no benchmark: a sanity check. `validate_returns.py` reads every
 committed daily snapshot and is the benchmark-adjusted, multi-date test that
-accumulates.
+accumulates. Yahoo can return the latest day's close as NaN; drop NaNs before
+taking first/last prices (one NaN turned every backtest average into NaN).
 
 `compute_trailing_performance()` ranks on *today's* fundamentals and then checks
 *past* price performance. It is structurally biased and informational only. Never
