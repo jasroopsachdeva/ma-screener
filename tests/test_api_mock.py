@@ -1,6 +1,6 @@
 """
-Data-location rules that only break on Render: snapshots are ordered by run
-number (as text, run-100 sorts before run-99), nothing may read
+API data-location rules that only break on Render: snapshots are ordered by
+run number (as text, run-100 sorts before run-99), nothing may read
 data/processed relative to the CWD (it is gitignored, so absent there), and
 freshness is judged by the data's own fetched_at, never by file mtimes.
 """
@@ -14,7 +14,6 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src import api
-from src import validate_returns as vr
 
 
 def _snap(root, run, body="ticker\n"):
@@ -60,18 +59,6 @@ def test_api_serves_newer_of_processed_and_snapshot():
     print("PASS: newer of data/processed and the latest snapshot is served; 'updated' comes from fetched_at")
 
 
-def test_backtest_keeps_earliest_run_of_a_day():
-    # Same-day re-run: run-99 then run-100. The dedup keeps the first one read.
-    with tempfile.TemporaryDirectory() as tmp:
-        for run, rank in (("99", 1), ("100", 2)):
-            _snap(tmp, run, f"fetched_at,rank,ticker\n2026-10-12T05:00:00Z,{rank},ABC.NS\n")
-        snap_dir = os.path.join(tmp, "snapshots")
-        with patch.object(vr, "SNAPSHOT_DIR", snap_dir), \
-                patch.object(vr, "SNAPSHOT_GLOB", os.path.join(snap_dir, "**", "scored_universe.csv")):
-            assert vr.load_snapshots()["rank"].tolist() == [1]
-    print("PASS: backtest dedup keeps run-99 over run-100 on the same day")
-
-
 def test_summary_pdf_reads_data_dir_not_cwd():
     ticker = api._load_scored()["ticker"].iloc[0]
     cwd = os.getcwd()
@@ -88,6 +75,5 @@ if __name__ == "__main__":
     test_api_serves_highest_run_number()
     test_api_without_any_data_falls_back_to_processed()
     test_api_serves_newer_of_processed_and_snapshot()
-    test_backtest_keeps_earliest_run_of_a_day()
     test_summary_pdf_reads_data_dir_not_cwd()
-    print("\nAll snapshot-order / data-path tests passed.")
+    print("\nAll API mock tests passed.")

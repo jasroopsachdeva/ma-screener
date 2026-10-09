@@ -134,6 +134,18 @@ def jackknife(values):
     return worst, loo[worst]
 
 
+def non_overlapping(as_of_dates, horizon_days):
+    """Indices of the windows that start at least horizon_days apart, taken
+    greedily from the first. Daily as-of dates make heavily overlapping
+    windows; only these are independent observations."""
+    keep, last = [], None
+    for i, d in enumerate(as_of_dates):
+        if last is None or (d - last).days >= horizon_days:
+            keep.append(i)
+            last = d
+    return keep
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--horizon", type=int, default=30,
@@ -224,6 +236,9 @@ def main():
     print(f"mean top-minus-bottom    : {agg['spread'].mean():+.2f}%  "
           f"95% CI [{lo:+.2f}, {hi:+.2f}]")
     print(f"spread positive in       : {wins}/{len(agg)} windows")
+    indep = agg["spread"].iloc[non_overlapping(agg["as_of"], horizon)]
+    print(f"non-overlapping windows  : {len(indep)} -> {', '.join(f'{s:+.2f}%' for s in indep)}"
+          f"  (positive in {int((indep > 0).sum())}/{len(indep)})")
     print()
     print("NOTE: overlapping windows from daily snapshots are NOT independent.")
     print("Treat the CI as indicative only; it understates true uncertainty.")
