@@ -297,7 +297,15 @@ def get_summary_pdf(ticker: str):
 
     try:
         out_path = str(Path(tempfile.gettempdir()) / f"summary_{ticker.replace('.', '_')}.pdf")
-        generate_summary_pdf(ticker, out_path)
+        # Pass DATA_DIR explicitly: the defaults are CWD-relative data/processed,
+        # which doesn't exist on Render (gitignored), so this 500'd there.
+        generate_summary_pdf(
+            ticker, out_path,
+            scored_path=f"{DATA_DIR}/scored_universe.csv",
+            comps_dupont_path=f"{DATA_DIR}/comps_dupont_report.csv",
+            explanations_path=f"{DATA_DIR}/explanations.csv",
+            likelihood_path=f"{DATA_DIR}/acquisition_likelihood.csv",
+        )
         return FileResponse(out_path, media_type="application/pdf", filename=f"summary_{ticker.replace('.', '_')}.pdf")
     except ValueError as e:
         raise HTTPException(400, str(e))
