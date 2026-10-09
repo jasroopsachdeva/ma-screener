@@ -60,6 +60,13 @@ D/E = 1). Snapshots from Aug 18, 2026 until this fix shipped have ROE for ~17%
 of rows and later ones ~98%, so any series across that boundary mixes two input
 regimes.
 
+**Statements can be in a different currency than the share price.** Yahoo
+reports INFY.NS's statements in USD while it trades in INR, which made its
+deal-model EPS ~95x too small. Ingestion converts `total_equity` and
+`total_debt` at the FX close (or drops them if there is no quote), so absolute
+figures are never mixed; ratios are currency-free. Snapshots made before this
+fix carry INFY's equity and debt in USD.
+
 **Snapshots are ordered by run number, never by path string.** As text,
 `run-100` sorts before `run-99`. `api.py` and `validate_returns.py` both rely on
 numeric order (`_run_number`).
@@ -73,11 +80,12 @@ excludes them via `max_target_size_pct`.
 **Only forward backtests are legitimate.**
 `validate_forward_performance()` (`backtest.py`) and `src/validate_returns.py`
 rank on what was recorded on a past date and measure price performance from that
-date forward. No look-ahead. `validate_forward_performance()` reads
-`data/history/shortlist_history.csv`, which is frozen at four dates (Jul 4, 6, 7
-and Aug 5, 2026) and will not grow (see the .gitignore section).
-`validate_returns.py` reads the committed daily snapshots, so it is the forward
-test that actually accumulates.
+date forward. No look-ahead. `validate_forward_performance()` checks one date
+only — the oldest eligible top-10 in `data/history/shortlist_history.csv`, which
+is frozen at Jul 4, 6, 7 and Aug 5, 2026 (see the .gitignore section) — against
+today, with no benchmark: a sanity check. `validate_returns.py` reads every
+committed daily snapshot and is the benchmark-adjusted, multi-date test that
+accumulates.
 
 `compute_trailing_performance()` ranks on *today's* fundamentals and then checks
 *past* price performance. It is structurally biased and informational only. Never
@@ -88,8 +96,8 @@ Current honest finding, from `src/validate_returns.py` (defaults, run
 full-universe decile backtest shows top-minus-bottom ≈ **+1.13%**, 95% CI
 [+0.80, +1.45], spread positive in 50 of 64 windows. That is **still not a
 statistically detectable signal**. The 64 windows are daily and overlap heavily,
-leaving only ~3 independent 30-day windows (−0.75%, +2.91%, +2.39%), so the CI
-is far too narrow. The scoring inputs also changed mid-sample (see ROE above).
+leaving only 3 independent 30-day windows (the script's `non-overlapping windows`
+line: −0.75%, +2.91%, +2.39%), so the CI is far too narrow. The scoring inputs also changed mid-sample (see ROE above).
 The earlier figure (−0.97%, CI [−1.28, −0.63], 0 of 7 windows, computed Aug 5
 from Jul 9–15 only) was equally inconclusive; the sign flip shows how unstable
 this is. Do not retune scoring weights to make this number look better and then
@@ -128,6 +136,12 @@ Consequences to respect:
 GitHub queueing usually delays it to ~11:10–11:50 IST). `workflow_dispatch` is
 enabled. Python 3.11, `timeout-minutes: 45`. A separate workflow runs the test
 suite on every push.
+
+Both workflows pin `runs-on: ubuntu-24.04`, because `ubuntu-latest` moves to
+Ubuntu 26 from 2026-10-19; bump it deliberately. Their actions (checkout@v4,
+setup-python@v5, cache@v4, upload-artifact@v4) target Node 20 and GitHub
+force-runs them on Node 24, which works. Bump majors deliberately too, and
+verify with a manual pipeline run.
 
 The test workflow runs each `tests/test_*.py` as a plain script
 (`python "$f"`), **not pytest**. Every test file inserts the repo root into
