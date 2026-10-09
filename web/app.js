@@ -427,7 +427,8 @@ function renderBestTargets() {
     renderTable(qs("#targets-table"), [
         { key: "target", label: "Target", type: "mono" },
         { key: "sector", label: "Sector", type: "text" },
-        { key: "relative_size_pct", label: "Rel. Size", type: "pct", decimals: 1 },
+        // already in percent (40.8 = 40.8%); type "pct" multiplied it by 100 again
+        { key: "relative_size_pct", label: "Rel. Size %", type: "num", decimals: 1 },
         { key: "target_composite_score", label: "Composite", type: "score" },
         { key: "target_acquisition_likelihood_score", label: "Acq. Likelihood", type: "score" },
         { key: "accretion_dilution_pct", label: "Accretion/Dilution", type: "signedPct" },
