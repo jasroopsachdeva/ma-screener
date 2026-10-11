@@ -39,6 +39,24 @@ def test_successful_fetch():
     print("PASS: successful fetch parses correctly")
 
 
+def test_missing_market_cap_rebuilt_from_price_and_shares():
+    """Yahoo intermittently omits marketCap for TCS.NS, RELIANCE.NS and six
+    others, which cleaning then excluded as a missing critical field."""
+    mock_ticker = MagicMock()
+    mock_ticker.info = {"currentPrice": 2156.0, "sharesOutstanding": 3_618_087_518, "trailingPE": 18.0}
+    mock_ticker.balance_sheet = MagicMock(empty=True)
+    mock_ticker.financials = MagicMock(empty=True)
+    with patch("src.ingestion.yf.Ticker", return_value=mock_ticker):
+        snap = fetch_ticker("TCS.NS")
+    assert snap.fetch_ok and snap.market_cap == 2156.0 * 3_618_087_518, snap.market_cap
+
+    del mock_ticker.info["sharesOutstanding"]
+    with patch("src.ingestion.yf.Ticker", return_value=mock_ticker):
+        snap = fetch_ticker("TCS.NS")
+    assert snap.market_cap is None, "without shares there is nothing to rebuild from; cleaning excludes it as before"
+    print("PASS: a missing marketCap is rebuilt as price x sharesOutstanding, and left missing without shares")
+
+
 def test_statements_in_another_currency_are_rebuilt_in_trading_currency():
     """Yahoo labels INFY.NS and HCLTECH.NS financials USD while they trade in
     INR, but only INFY's balance sheet is actually USD (both report totalDebt
@@ -185,4 +203,5 @@ if __name__ == "__main__":
     test_config_validation_catches_bad_weights()
     test_config_validation_passes_on_the_real_expanded_config()
     test_statements_in_another_currency_are_rebuilt_in_trading_currency()
+    test_missing_market_cap_rebuilt_from_price_and_shares()
     print("\nAll mock tests passed.")

@@ -112,6 +112,12 @@ def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backo
 
             market_cap = info.get("marketCap")
             price = info.get("currentPrice") or info.get("regularMarketPrice")
+            # Yahoo intermittently omits marketCap for the same 8 tickers (TCS.NS,
+            # RELIANCE.NS, IOC.NS, ...: 12 of runs 77-96), and cleaning then drops
+            # them for a missing critical field. Its marketCap is price x
+            # sharesOutstanding (within 0.1% when both exist), so rebuild it.
+            if market_cap is None and price and info.get("sharesOutstanding"):
+                market_cap = price * info["sharesOutstanding"]
             trailing_pe = info.get("trailingPE")
             ev_to_ebitda = info.get("enterpriseToEbitda")
             roe = info.get("returnOnEquity")
