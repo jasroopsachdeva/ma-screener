@@ -21,6 +21,7 @@ import math
 import re
 import traceback
 from dataclasses import asdict
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
@@ -187,9 +188,27 @@ def get_deal_eligible_tickers():
     return sorted(valid["ticker"].tolist())
 
 
+@lru_cache(maxsize=1)
+def _previous_ranks() -> Optional[pd.Series]:
+    """ticker -> rank in the run before the one being served (the newest other
+    snapshot). Snapshots only change with a new deploy, so read it once."""
+    served = Path(DATA_DIR).resolve()
+    others = [csv for csv in ROOT.glob("snapshots/run-*/**/scored_universe.csv") if csv.parent.resolve() != served]
+    if not others:
+        return None
+    try:
+        return pd.read_csv(max(others, key=_run_number), usecols=["ticker", "rank"]).set_index("ticker")["rank"]
+    except (ValueError, OSError):
+        return None
+
+
 @app.get("/api/shortlist")
 def get_shortlist(sector: Optional[str] = None, top_n: int = 200):
     df = _load_scored()
+    prev = _previous_ranks()
+    if prev is not None:
+        # positive = moved up since the previous run; null = not ranked in it
+        df = df.assign(rank_change=df["ticker"].map(prev) - df["rank"])
     if sector:
         df = df[df["sector"] == sector]
     df = df.sort_values("rank").head(top_n)

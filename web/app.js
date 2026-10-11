@@ -145,6 +145,11 @@ function renderTable(container, columns, rows) {
             let content, style = "", cls = "";
             switch (c.type) {
                 case "mono": content = escapeHtml(val); cls = "mono"; break;
+                case "link": content = `<a href="${escapeHtml(c.href(row))}">${escapeHtml(val)}</a>`; cls = "mono"; break;
+                case "rankDelta":  // places moved since the previous run; null = not ranked then
+                    content = val === null || val === undefined ? "new" : val === 0 ? "&ndash;" : `${val > 0 ? "&#9650;" : "&#9660;"}${Math.abs(val)}`;
+                    if (val) style = `color:${val > 0 ? "#16A34A" : "#DC2626"};font-weight:600;`;
+                    break;
                 case "pct": content = fmtPct(val, c.decimals ?? 1); break;
                 case "signedPct":
                     content = fmtSignedPct(val, c.decimals ?? 2);
@@ -210,12 +215,15 @@ function renderShortlist() {
     let rows = activeSectors.length > 0 ? shortlistData.filter(r => activeSectors.includes(r.sector)) : shortlistData;
     rows = [...rows].sort((a, b) => a.rank - b.rank).slice(0, topN);
 
+    const hasPrev = shortlistData.length > 0 && "rank_change" in shortlistData[0];
     renderTable(qs("#shortlist-table"), [
         { key: "rank", label: "Rank", type: "int" },
-        { key: "ticker", label: "Ticker", type: "mono" },
+        ...(hasPrev ? [{ key: "rank_change", label: "vs Prev.", type: "rankDelta" }] : []),
+        { key: "ticker", label: "Ticker", type: "link", href: r => `/summary.html?ticker=${encodeURIComponent(r.ticker)}` },
         { key: "sector", label: "Sector", type: "text" },
         { key: "sector_rank", label: "Sector Rank", type: "int" },
         { key: "composite_score", label: "Composite", type: "score" },
+        { key: "buckets_used", label: "Factors", type: "int" },
         { key: "trailing_pe", label: "P/E", type: "num", decimals: 1 },
         { key: "return_on_equity", label: "ROE", type: "pct" },
         { key: "debt_to_equity_ratio", label: "D/E", type: "num" },
@@ -234,9 +242,11 @@ function renderShortlist() {
 
 async function initShortlist() {
     try {
-        const [sectors, shortlist, explanations] = await Promise.all([
+        const [sectors, shortlist, explanations, hero] = await Promise.all([
             fetchJSON("/api/sectors"), fetchJSON("/api/shortlist?top_n=500"), fetchJSON("/api/explanations"),
+            fetchJSON("/api/hero-stats").catch(() => null),
         ]);
+        if (hero) qs("#shortlist-asof").textContent = `Data as of ${hero.updated} · ${hero.universe} companies.`;
         shortlistData = shortlist;
         explanationsData = explanations;
         setupSectorPills(qs("#shortlist-sector-pills"), sectors, renderShortlist);
@@ -334,6 +344,8 @@ const updateDeal = debounce(async () => {
     }
 
     const req = currentDealRequest();
+    // Keep the address bar in sync so the current pair can be shared or bookmarked.
+    history.replaceState(null, "", `?acquirer=${encodeURIComponent(acquirer)}&target=${encodeURIComponent(target)}`);
     try {
         const result = await fetchJSON("/api/deal", { method: "POST", body: JSON.stringify(req) });
         resultsEl.innerHTML = `
@@ -389,7 +401,10 @@ async function initDealSimulator() {
         // AXISBANK.NS at +645%. Several, because any ticker can drop out of a day's
         // fetch (TCS.NS was missing from run-96). Falls back to the first two tickers.
         const pairs = [["TCS.NS", "COFORGE.NS"], ["HCLTECH.NS", "PERSISTENT.NS"], ["WIPRO.NS", "MPHASIS.NS"]];
-        const [acquirer, target] = pairs.find(p => p.every(t => tickers.includes(t))) || tickers;
+        // A pair in the URL (from Best Targets, or a shared link) wins.
+        const params = new URLSearchParams(location.search);
+        const fromUrl = [params.get("acquirer"), params.get("target")];
+        const [acquirer, target] = [fromUrl, ...pairs].find(p => p.every(t => tickers.includes(t))) || tickers;
         if (acquirer) qs("#deal-acquirer").value = acquirer;
         if (target) qs("#deal-target").value = target;
 
@@ -422,10 +437,12 @@ function renderBestTargets() {
     rows = rows.slice(0, 20);
 
     const nAccretive = bestTargetsFullResult.filter(r => r.is_accretive).length;
-    qs("#targets-caption").textContent = `${nAccretive}/${bestTargetsFullResult.length} evaluated targets would be accretive under these terms.`;
+    qs("#targets-caption").textContent = `${nAccretive}/${bestTargetsFullResult.length} evaluated targets would be accretive under these terms. Click a target to open the deal in the Deal Simulator.`;
 
+    const acquirer = qs("#targets-acquirer").value;
     renderTable(qs("#targets-table"), [
-        { key: "target", label: "Target", type: "mono" },
+        { key: "target", label: "Target", type: "link",
+          href: r => `/deal.html?acquirer=${encodeURIComponent(acquirer)}&target=${encodeURIComponent(r.target)}` },
         { key: "sector", label: "Sector", type: "text" },
         // already in percent (40.8 = 40.8%); type "pct" multiplied it by 100 again
         { key: "relative_size_pct", label: "Rel. Size %", type: "num", decimals: 1 },
@@ -479,6 +496,9 @@ async function initBestTargets() {
     try {
         const [tickers, sectors] = await Promise.all([fetchJSON("/api/tickers/deal-eligible"), fetchJSON("/api/sectors")]);
         qs("#targets-acquirer").innerHTML = tickers.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+        // Same default acquirers as the Deal Simulator, not the alphabetically first ticker.
+        const preferred = ["TCS.NS", "HCLTECH.NS", "WIPRO.NS"].find(t => tickers.includes(t));
+        if (preferred) qs("#targets-acquirer").value = preferred;
 
         setupSectorPills(qs("#targets-sector-pills"), sectors, renderBestTargets);
 
@@ -564,6 +584,8 @@ async function initSummary() {
     try {
         const tickers = await fetchJSON("/api/tickers");
         qs("#summary-ticker").innerHTML = tickers.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+        const fromUrl = new URLSearchParams(location.search).get("ticker");  // from a Shortlist link
+        if (tickers.includes(fromUrl)) qs("#summary-ticker").value = fromUrl;
     } catch (e) {
         qs("#summary-status").innerHTML = `<div class="error-state">${escapeHtml(e.message)}</div>`;
         return;
