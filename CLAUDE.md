@@ -152,8 +152,12 @@ The test workflow runs each `tests/test_*.py` as a plain script
 (`tmp_path`, `monkeypatch`) don't exist there, so use `tempfile` and
 `unittest.mock.patch`. A file that passes under pytest can still fail CI.
 
-Transient yfinance rate-limit dropouts cost a handful of large-cap rows on some
-runs. A run with fewer rows than usual is normal variance, not necessarily a bug.
+Most "missing large caps" were not rate limits: Yahoo omitted `marketCap` for
+the same 8 tickers (TCS, RELIANCE, IOC, …) in 12 of runs 77–96, and cleaning
+dropped them. Ingestion now rebuilds it as price × shares outstanding. A run a
+few rows short can still be transient fetch failures. LTIM.NS has had no Yahoo
+data in any recent run, under any variant symbol: check its NSE status rather
+than treating it as a dropout.
 
 ## Deployment
 
