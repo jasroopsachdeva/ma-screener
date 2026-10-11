@@ -50,11 +50,18 @@ def test_missing_market_cap_rebuilt_from_price_and_shares():
         snap = fetch_ticker("TCS.NS")
     assert snap.fetch_ok and snap.market_cap == 2156.0 * 3_618_087_518, snap.market_cap
 
-    del mock_ticker.info["sharesOutstanding"]
+    import pandas as pd
+    del mock_ticker.info["sharesOutstanding"]  # run-99: the quote lacked shares too
+    mock_ticker.balance_sheet = pd.DataFrame({"2026": [3_618_087_518.0]}, index=["Ordinary Shares Number"])
+    with patch("src.ingestion.yf.Ticker", return_value=mock_ticker):
+        snap = fetch_ticker("TCS.NS")
+    assert snap.market_cap == 2156.0 * 3_618_087_518, f"expected the balance sheet's share count, got {snap.market_cap}"
+
+    mock_ticker.balance_sheet = MagicMock(empty=True)
     with patch("src.ingestion.yf.Ticker", return_value=mock_ticker):
         snap = fetch_ticker("TCS.NS")
     assert snap.market_cap is None, "without shares there is nothing to rebuild from; cleaning excludes it as before"
-    print("PASS: a missing marketCap is rebuilt as price x sharesOutstanding, and left missing without shares")
+    print("PASS: a missing marketCap is rebuilt as price x shares (quote, else balance sheet), and left missing without shares")
 
 
 def test_statements_in_another_currency_are_rebuilt_in_trading_currency():

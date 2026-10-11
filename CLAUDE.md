@@ -153,8 +153,10 @@ The test workflow runs each `tests/test_*.py` as a plain script
 `unittest.mock.patch`. A file that passes under pytest can still fail CI.
 
 Most "missing large caps" were not rate limits: Yahoo omitted `marketCap` for
-the same 8 tickers (TCS, RELIANCE, IOC, …) in 12 of runs 77–96, and cleaning
-dropped them. Ingestion now rebuilds it as price × shares outstanding. A run a
+the same 8 tickers (TCS, RELIANCE, IOC, …) in 12 of runs 77–96 and in run-99,
+sometimes with `sharesOutstanding` missing too, and cleaning dropped them.
+Ingestion now rebuilds it as price × shares, taking the share count from the
+quote or else the balance sheet ("Ordinary Shares Number"). A run a
 few rows short can still be transient fetch failures. LTIM.NS has had no Yahoo
 data in any recent run, under any variant symbol: check its NSE status rather
 than treating it as a dropout.

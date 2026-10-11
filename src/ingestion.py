@@ -112,12 +112,6 @@ def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backo
 
             market_cap = info.get("marketCap")
             price = info.get("currentPrice") or info.get("regularMarketPrice")
-            # Yahoo intermittently omits marketCap for the same 8 tickers (TCS.NS,
-            # RELIANCE.NS, IOC.NS, ...: 12 of runs 77-96), and cleaning then drops
-            # them for a missing critical field. Its marketCap is price x
-            # sharesOutstanding (within 0.1% when both exist), so rebuild it.
-            if market_cap is None and price and info.get("sharesOutstanding"):
-                market_cap = price * info["sharesOutstanding"]
             trailing_pe = info.get("trailingPE")
             ev_to_ebitda = info.get("enterpriseToEbitda")
             roe = info.get("returnOnEquity")
@@ -140,12 +134,25 @@ def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backo
 
             total_debt = info.get("totalDebt")
             total_equity = None
+            bs_shares = None
             try:
                 bs = t.balance_sheet
                 if bs is not None and not bs.empty and "Common Stock Equity" in bs.index:
                     total_equity = float(bs.loc["Common Stock Equity"].iloc[0])
+                if bs is not None and not bs.empty and "Ordinary Shares Number" in bs.index:
+                    bs_shares = float(bs.loc["Ordinary Shares Number"].dropna().iloc[0])
             except Exception:
                 pass  # equity detail is a bonus field, not fetch-critical
+
+            # Yahoo intermittently omits marketCap for the same 8 tickers (TCS.NS,
+            # RELIANCE.NS, IOC.NS, ...: 12 of runs 77-96, and run-99), at times
+            # with sharesOutstanding too, and cleaning then drops them for a
+            # missing critical field. Rebuild it as price x shares, from the
+            # quote or else the balance sheet (within 2.5% of Yahoo's marketCap
+            # for all 8 when it is present).
+            if market_cap is None and price:
+                shares = info.get("sharesOutstanding") or bs_shares
+                market_cap = price * shares if shares else None
 
             asset_turnover = None
             try:
