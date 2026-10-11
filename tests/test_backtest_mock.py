@@ -117,8 +117,20 @@ def test_validate_forward_performance_computes_real_forward_return_when_history_
           f"(as_of={result['as_of_date']}, avg_return={result['avg_forward_return']:.1%})")
 
 
+def test_fetch_price_return_ignores_a_nan_close():
+    # Yahoo returned the latest day with a NaN close, which turned every
+    # trailing/forward average into NaN.
+    mock_ticker = MagicMock()
+    mock_ticker.history.return_value = pd.DataFrame({"Close": [100.0, 110.0, 120.0, float("nan")]})
+    with patch("yfinance.Ticker", return_value=mock_ticker):
+        result = fetch_price_return("TEST.NS", lookback_days=180)
+    assert abs(result - 0.20) < 1e-9, f"expected 20% from the last valid close, got {result}"
+    print("PASS: fetch_price_return uses the last valid close when Yahoo's latest one is NaN")
+
+
 if __name__ == "__main__":
     test_fetch_price_return_matches_hand_calc()
+    test_fetch_price_return_ignores_a_nan_close()
     test_fetch_price_return_handles_empty_history_gracefully()
     test_fetch_price_return_handles_exception_gracefully()
     test_compute_trailing_performance_group_averages_match_hand_calc()

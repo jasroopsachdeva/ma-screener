@@ -155,6 +155,25 @@ def test_implied_roe_recovers_even_when_reported_roe_missing():
           f"despite missing reported ROE")
 
 
+def test_implied_roe_does_not_double_count_leverage():
+    """asset_turnover from ingestion is revenue / EQUITY, so margin x turnover
+    is already ROE. A company with debt equal to equity used to get double its
+    real ROE from the extra equity multiplier — invisible on ACC (D/E ~0.02).
+    A ROE that cleaning derived has no reported figure to check a gap against."""
+    lev = {"net_margin": 0.10, "asset_turnover": 2.0,  # NI 100, revenue 1000, equity 500 -> ROE 0.20
+           "total_debt": 500.0, "total_equity": 500.0, "return_on_equity": 0.20}
+    df = pd.DataFrame([{"ticker": "LEV.NS", **lev, "roe_derived": False},
+                       {"ticker": "DER.NS", **lev, "roe_derived": True}])
+    out = compute_dupont(df).set_index("ticker")
+
+    assert abs(out.loc["LEV.NS", "dupont_implied_roe"] - 0.20) < 1e-12, (
+        f"implied ROE must equal NI / equity (0.20), got {out.loc['LEV.NS', 'dupont_implied_roe']:.4f}"
+    )
+    assert abs(out.loc["LEV.NS", "dupont_vs_reported_roe_gap"]) < 1e-12
+    assert pd.isna(out.loc["DER.NS", "dupont_vs_reported_roe_gap"]), "derived ROE must not be gap-checked"
+    print("PASS: DuPont-implied ROE equals NI/equity on a leveraged company (no double-counted leverage)")
+
+
 if __name__ == "__main__":
     test_dupont_reconciles_with_real_acc_data()
     test_negative_equity_does_not_crash_and_is_flagged()
@@ -162,4 +181,5 @@ if __name__ == "__main__":
     test_missing_required_columns_fails_clearly()
     test_gap_column_abs_does_not_crash_with_missing_roe()
     test_implied_roe_recovers_even_when_reported_roe_missing()
+    test_implied_roe_does_not_double_count_leverage()
     print("\nAll comps + DuPont mock tests passed.")

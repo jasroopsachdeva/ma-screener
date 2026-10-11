@@ -100,6 +100,33 @@ def test_zero_revenue_proxy_flagged():
     print("PASS: zero asset turnover (revenue proxy issue) is flagged")
 
 
+def test_missing_roe_derived_from_margin_and_turnover():
+    """Yahoo stopped returning returnOnEquity for most NSE tickers in Aug 2026.
+    asset_turnover is revenue / equity, so net_margin x asset_turnover =
+    NI / equity fills the gap, flagged as derived. Reported ROE is never
+    overwritten, and a negative equity base or an implausible result stays
+    missing rather than producing a nonsense ROE."""
+    cleaned, flags = clean_snapshot({**REAL_ACC_DATA, "return_on_equity": None})
+    expected = REAL_ACC_DATA["net_margin"] * REAL_ACC_DATA["asset_turnover"]
+    assert abs(cleaned["return_on_equity"] - expected) < 1e-12
+    assert cleaned["roe_derived"] is True and flags.derived_fields == ["return_on_equity"]
+    assert abs(expected - REAL_ACC_DATA["return_on_equity"]) < 0.01, "derived ROE should be near ACC's reported 10.9%"
+
+    cleaned, flags = clean_snapshot(dict(REAL_ACC_DATA))
+    assert cleaned["return_on_equity"] == REAL_ACC_DATA["return_on_equity"], "reported ROE must not be overwritten"
+    assert cleaned["roe_derived"] is False and flags.derived_fields == []
+
+    cleaned, _ = clean_snapshot({**REAL_ACC_DATA, "return_on_equity": None, "total_equity": -1e9, "asset_turnover": -0.5})
+    assert cleaned["return_on_equity"] is None and cleaned["roe_derived"] is False, "no ROE from a negative equity base"
+
+    cleaned, flags = clean_snapshot({**REAL_ACC_DATA, "return_on_equity": None, "net_margin": 3.0, "asset_turnover": 2.5})
+    assert cleaned["return_on_equity"] is None and "return_on_equity" in flags.outlier_fields, (
+        "a derived ROE must face the same sanity bounds as a reported one"
+    )
+    print(f"PASS: missing ROE derived as net_margin x asset_turnover ({expected:.4f} vs ACC's reported "
+          f"{REAL_ACC_DATA['return_on_equity']:.4f}) and flagged; reported, negative-equity and outlier cases handled")
+
+
 if __name__ == "__main__":
     test_known_good_data_passes_clean()
     test_failed_fetch_excluded()
@@ -108,4 +135,5 @@ if __name__ == "__main__":
     test_outlier_pe_flagged()
     test_outlier_field_nulled_but_row_kept()
     test_zero_revenue_proxy_flagged()
+    test_missing_roe_derived_from_margin_and_turnover()
     print("\nAll cleaning mock tests passed.")

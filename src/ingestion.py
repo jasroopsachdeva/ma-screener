@@ -112,6 +112,12 @@ def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backo
 
             market_cap = info.get("marketCap")
             price = info.get("currentPrice") or info.get("regularMarketPrice")
+            # Yahoo intermittently omits marketCap for the same 8 tickers (TCS.NS,
+            # RELIANCE.NS, IOC.NS, ...: 12 of runs 77-96), and cleaning then drops
+            # them for a missing critical field. Its marketCap is price x
+            # sharesOutstanding (within 0.1% when both exist), so rebuild it.
+            if market_cap is None and price and info.get("sharesOutstanding"):
+                market_cap = price * info["sharesOutstanding"]
             trailing_pe = info.get("trailingPE")
             ev_to_ebitda = info.get("enterpriseToEbitda")
             roe = info.get("returnOnEquity")
@@ -153,6 +159,18 @@ def fetch_ticker(ticker: str, sector: str | None = None, retries: int = 2, backo
                     asset_turnover = revenue / total_equity if total_equity else None
             except Exception:
                 pass
+
+            # When Yahoo's financialCurrency differs from the trading currency,
+            # it is inconsistent about which figures it converted: INFY.NS's
+            # balance sheet is in USD but HCLTECH.NS's is in INR, while both
+            # report totalDebt in USD. Mixing them made INFY's deal-model EPS
+            # ~95x too small (and an FX conversion would inflate HCLTECH ~97x).
+            # Rebuild the absolute figures from fields quoted in the trading
+            # currency instead; the statement ratios are unaffected.
+            if info.get("financialCurrency") not in (None, info.get("currency")):
+                book_value, shares, de = info.get("bookValue"), info.get("sharesOutstanding"), info.get("debtToEquity")
+                total_equity = book_value * shares if book_value and shares else None
+                total_debt = de / 100 * total_equity if de is not None and total_equity else None
 
             return TickerSnapshot(
                 ticker=ticker,

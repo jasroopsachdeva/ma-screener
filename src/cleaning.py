@@ -19,7 +19,7 @@ Usage:
 
 import json
 import logging
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from pathlib import Path
 
 import pandas as pd
@@ -52,6 +52,7 @@ class CleaningFlags:
     outlier_fields: list
     negative_equity: bool
     zero_or_negative_revenue_proxy: bool
+    derived_fields: list = field(default_factory=list)
 
 
 def load_raw_snapshots(raw_dir: str = "data/raw") -> list[dict]:
@@ -107,8 +108,6 @@ def clean_snapshot(row: dict) -> tuple[dict, CleaningFlags]:
         )
         return row, flags
 
-    outliers = _check_outliers(row)
-
     total_equity = row.get("total_equity")
     negative_equity = total_equity is not None and total_equity <= 0
 
@@ -118,11 +117,31 @@ def clean_snapshot(row: dict) -> tuple[dict, CleaningFlags]:
     asset_turnover = row.get("asset_turnover")
     zero_or_negative_revenue_proxy = asset_turnover is not None and asset_turnover <= 0
 
+    # Yahoo stopped returning returnOnEquity for most NSE tickers (95% of the
+    # universe in Jul 2026, 17% from mid-Aug). ingestion's asset_turnover is
+    # revenue / equity, so net_margin x asset_turnover = NI / equity; on the
+    # Jul snapshots it matched reported ROE with a 1.0pp median gap (corr
+    # 0.96). Derived before the outlier check so it faces the same sanity
+    # bounds as a reported value, and flagged (roe_derived) so it is never
+    # mistaken for a reported figure.
+    derived = []
+    if (
+        row.get("return_on_equity") is None
+        and row.get("net_margin") is not None
+        and asset_turnover is not None and asset_turnover > 0
+        and total_equity is not None and not negative_equity
+    ):
+        row = {**row, "return_on_equity": row["net_margin"] * asset_turnover}
+        derived.append("return_on_equity")
+
+    outliers = _check_outliers(row)
+
     flags = CleaningFlags(
         ticker=ticker, excluded=False, exclusion_reason=None,
         missing_fields=missing, outlier_fields=outliers,
         negative_equity=negative_equity,
         zero_or_negative_revenue_proxy=zero_or_negative_revenue_proxy,
+        derived_fields=derived,
     )
 
     # Normalize debt_to_equity to a plain ratio (yfinance gives it as a %,
@@ -141,6 +160,7 @@ def clean_snapshot(row: dict) -> tuple[dict, CleaningFlags]:
     # for audit purposes; it just doesn't propagate into the scoring input.
     for outlier_field in outliers:
         cleaned[outlier_field] = None
+    cleaned["roe_derived"] = bool(derived) and cleaned["return_on_equity"] is not None
 
     return cleaned, flags
 
@@ -167,6 +187,11 @@ def clean_universe(raw_dir: str = "data/raw", output_dir: str = "data/processed"
                 logger.info(f"[{f.ticker}] non-critical missing fields: {f.missing_fields}")
 
     df = pd.DataFrame(rows)
+    if "roe_derived" in df.columns and df["roe_derived"].any():
+        logger.info(
+            f"Derived ROE as net_margin x asset_turnover for {int(df['roe_derived'].sum())}/{len(df)} "
+            f"tickers where Yahoo returned no returnOnEquity (flagged in the roe_derived column)"
+        )
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     out_path = Path(output_dir) / "cleaned_universe.csv"

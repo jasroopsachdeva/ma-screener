@@ -29,7 +29,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.accretion_dilution import DealInputs, run_deal, run_sensitivity, _company_fundamentals, find_optimal_terms, find_best_targets, project_multi_year_accretion
+from src.accretion_dilution import DealInputs, check_target_size, run_deal, run_sensitivity, _company_fundamentals, find_optimal_terms, find_best_targets, project_multi_year_accretion
 
 
 def _make_universe():
@@ -687,6 +687,19 @@ def test_multi_year_ramp_extends_last_value_if_years_exceed_ramp_length():
     print("PASS: years beyond the ramp schedule length correctly hold at the last (full run-rate) ramp value")
 
 
+def test_single_deal_rejects_target_larger_than_acquirer():
+    """The Deal Simulator had no size rule (only Best Targets did), so ABB.NS
+    'buying' the larger AXISBANK.NS showed +645% accretion on the live site."""
+    df = _make_universe()  # A.NS market cap 1,000,000; T.NS 200,000
+    check_target_size(df, "A.NS", "T.NS")  # target 20% of the acquirer: allowed
+    try:
+        check_target_size(df, "T.NS", "A.NS")  # target 5x the acquirer
+        raise AssertionError("a target 5x the acquirer's market cap must be rejected")
+    except ValueError as e:
+        assert "5.0x" in str(e), f"error should state the size ratio: {e}"
+    print("PASS: single-deal size rule allows a 20% target and rejects a 5x target with the ratio in the message")
+
+
 if __name__ == "__main__":
     test_fundamentals_derivation_matches_hand_calc()
     test_deal_math_matches_hand_calc()
@@ -720,4 +733,5 @@ if __name__ == "__main__":
     test_multi_year_standalone_earnings_growth_matches_hand_calc()
     test_missing_revenue_growth_defaults_to_zero_not_error()
     test_multi_year_ramp_extends_last_value_if_years_exceed_ramp_length()
+    test_single_deal_rejects_target_larger_than_acquirer()
     print("\nAll accretion/dilution mock tests passed.")

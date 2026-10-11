@@ -66,23 +66,31 @@ def test_sector_peers_excludes_self_and_other_sectors():
 
 def test_illustrative_deal_matches_hand_calc():
     scored = _make_scored_universe()
-    deal = _illustrative_deal("TCS.NS", scored)
+    deal = _illustrative_deal("WIPRO.NS", scored)
     assert deal is not None
-    assert deal["acquirer"] == "INFY.NS", f"expected INFY.NS (top-ranked IT peer), got {deal['acquirer']}"
+    assert deal["acquirer"] == "TCS.NS", f"expected TCS.NS (top-ranked IT peer), got {deal['acquirer']}"
     assert deal["premium_pct"] == 0.25
     assert deal["cash_pct"] == 0.5
     assert isinstance(deal["is_accretive"], bool)
-    print(f"PASS: illustrative deal correctly picks INFY.NS as acquirer for TCS.NS, "
+    print(f"PASS: illustrative deal correctly picks TCS.NS as acquirer for WIPRO.NS, "
           f"verdict={'ACCRETIVE' if deal['is_accretive'] else 'DILUTIVE'}")
 
 
 def test_illustrative_deal_falls_back_to_next_peer_if_top_one_is_broken():
     scored = _make_scored_universe()
-    scored.loc[scored.ticker == "INFY.NS", "return_on_equity"] = None
-    deal = _illustrative_deal("TCS.NS", scored)
+    scored.loc[scored.ticker == "TCS.NS", "return_on_equity"] = None
+    deal = _illustrative_deal("WIPRO.NS", scored)
     assert deal is not None
-    assert deal["acquirer"] == "WIPRO.NS", f"expected fallback to WIPRO.NS, got {deal['acquirer']}"
+    assert deal["acquirer"] == "INFY.NS", f"expected fallback to INFY.NS, got {deal['acquirer']}"
     print("PASS: illustrative deal falls back to the next-best peer when the top one is missing data")
+
+
+def test_illustrative_deal_skips_peers_smaller_than_the_target():
+    # TCS.NS is 3x INFY.NS and 6x WIPRO.NS: neither can plausibly acquire it,
+    # so there is no illustrative deal rather than a nonsense one.
+    scored = _make_scored_universe()
+    assert _illustrative_deal("TCS.NS", scored) is None
+    print("PASS: illustrative deal is omitted when every sector peer is smaller than the target")
 
 
 def test_illustrative_deal_returns_none_when_no_sector_peers_exist():
@@ -98,7 +106,7 @@ def test_build_summary_data_degrades_gracefully_when_optional_files_missing():
     with tempfile.TemporaryDirectory() as tmp:
         scored.to_csv(f"{tmp}/scored.csv", index=False)
         data = build_summary_data(
-            "TCS.NS",
+            "WIPRO.NS",
             scored_path=f"{tmp}/scored.csv",
             comps_dupont_path=f"{tmp}/nonexistent.csv",
             explanations_path=f"{tmp}/nonexistent2.csv",
@@ -131,15 +139,15 @@ def test_generate_summary_pdf_produces_a_real_pdf_with_new_sections():
     with tempfile.TemporaryDirectory() as tmp:
         scored.to_csv(f"{tmp}/scored.csv", index=False)
         out_path = f"{tmp}/summary.pdf"
-        generate_summary_pdf("TCS.NS", out_path, scored_path=f"{tmp}/scored.csv")
+        generate_summary_pdf("WIPRO.NS", out_path, scored_path=f"{tmp}/scored.csv")
         assert Path(out_path).exists()
         reader = PdfReader(out_path)
         assert len(reader.pages) >= 1
         full_text = "".join(p.extract_text() for p in reader.pages)
-        assert "TCS.NS" in full_text
+        assert "WIPRO.NS" in full_text
         assert "Sector Peer Comparison" in full_text
         assert "Illustrative Deal Snapshot" in full_text
-        assert "INFY.NS" in full_text
+        assert "TCS.NS" in full_text
         print(f"PASS: generated PDF ({len(reader.pages)} page(s)) contains the new sector-peer "
               f"and illustrative-deal sections with real content")
 
@@ -150,6 +158,7 @@ if __name__ == "__main__":
     test_illustrative_deal_matches_hand_calc()
     test_illustrative_deal_falls_back_to_next_peer_if_top_one_is_broken()
     test_illustrative_deal_returns_none_when_no_sector_peers_exist()
+    test_illustrative_deal_skips_peers_smaller_than_the_target()
     test_build_summary_data_degrades_gracefully_when_optional_files_missing()
     test_missing_ticker_raises_clear_error()
     test_generate_summary_pdf_produces_a_real_pdf_with_new_sections()

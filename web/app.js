@@ -384,7 +384,14 @@ async function initDealSimulator() {
         const options = tickers.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
         qs("#deal-acquirer").innerHTML = options;
         qs("#deal-target").innerHTML = options;
-        if (tickers.length > 1) qs("#deal-target").value = tickers[1];
+        // Plausible example pairs (same sector, target 10-28% of the acquirer's size)
+        // instead of alphabetical order, which opened on ABB.NS buying the larger
+        // AXISBANK.NS at +645%. Several, because any ticker can drop out of a day's
+        // fetch (TCS.NS was missing from run-96). Falls back to the first two tickers.
+        const pairs = [["TCS.NS", "COFORGE.NS"], ["HCLTECH.NS", "PERSISTENT.NS"], ["WIPRO.NS", "MPHASIS.NS"]];
+        const [acquirer, target] = pairs.find(p => p.every(t => tickers.includes(t))) || tickers;
+        if (acquirer) qs("#deal-acquirer").value = acquirer;
+        if (target) qs("#deal-target").value = target;
 
         bindSliderDisplay("deal-premium", "deal-premium-value", "%");
         bindSliderDisplay("deal-cash", "deal-cash-value", "%");
@@ -420,7 +427,8 @@ function renderBestTargets() {
     renderTable(qs("#targets-table"), [
         { key: "target", label: "Target", type: "mono" },
         { key: "sector", label: "Sector", type: "text" },
-        { key: "relative_size_pct", label: "Rel. Size", type: "pct", decimals: 1 },
+        // already in percent (40.8 = 40.8%); type "pct" multiplied it by 100 again
+        { key: "relative_size_pct", label: "Rel. Size %", type: "num", decimals: 1 },
         { key: "target_composite_score", label: "Composite", type: "score" },
         { key: "target_acquisition_likelihood_score", label: "Acq. Likelihood", type: "score" },
         { key: "accretion_dilution_pct", label: "Accretion/Dilution", type: "signedPct" },
