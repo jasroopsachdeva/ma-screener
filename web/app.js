@@ -268,15 +268,16 @@ async function initDupont() {
         const data = await fetchJSON("/api/comps-dupont");
         renderTable(qs("#dupont-table"), [
             { key: "rank", label: "Rank", type: "int" },
-            { key: "ticker", label: "Ticker", type: "mono" },
+            { key: "ticker", label: "Ticker", type: "link", href: r => `/summary.html?ticker=${encodeURIComponent(r.ticker)}` },
             { key: "sector", label: "Sector", type: "text" },
+            { key: "trailing_pe", label: "P/E", type: "num", decimals: 1 },
+            { key: "trailing_pe_sector_median", label: "Sector P/E", type: "num", decimals: 1 },
             { key: "valuation_label", label: "Valuation", type: "text" },
             { key: "return_on_equity", label: "ROE", type: "pct" },
             { key: "net_margin", label: "Net Margin", type: "pct" },
             { key: "asset_turnover", label: "Asset Turnover", type: "num" },
             { key: "equity_multiplier", label: "Equity Mult.", type: "num" },
-            { key: "dupont_implied_roe", label: "Implied ROE", type: "pct" },
-            { key: "dupont_vs_reported_roe_gap", label: "Gap", type: "pct" },
+            { key: "roe_edge", label: "ROE Edge vs Sector", type: "text" },
         ], data);
     } catch (e) {
         qs("#dupont-table").innerHTML = `<div class="error-state">${escapeHtml(e.message)}</div>`;

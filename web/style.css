@@ -409,6 +409,11 @@ footer {
 .tools-menu * { min-width: 0; }
 .tool-desc, .tool-title { white-space: normal; overflow-wrap: break-word; }
 
+/* The 11-column comps table: wrapped headers and tighter cells keep the last
+   columns (ROE edge) on a 1366px laptop screen instead of behind a scroll. */
+#dupont-table th { white-space: normal; }
+#dupont-table th, #dupont-table td { padding-left: 10px; padding-right: 10px; }
+
 /* Phones: the dropdown was pinned to the Tools button's left edge and ran off
    the right of the screen. Anchor it to the sticky navbar's width instead.
    Last in the file so it wins over the .tools-menu width rule above. */
