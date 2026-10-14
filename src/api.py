@@ -33,6 +33,7 @@ from pydantic import BaseModel
 
 from src.accretion_dilution import DealInputs, check_target_size, run_deal, find_optimal_terms, find_best_targets, project_multi_year_accretion
 from src.acquisition_likelihood import score_acquisition_likelihood
+from src.comps_dupont import comps_dupont_table
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -217,8 +218,9 @@ def get_shortlist(sector: Optional[str] = None, top_n: int = 200):
 
 @app.get("/api/comps-dupont")
 def get_comps_dupont():
-    df = _safe_read(f"{DATA_DIR}/comps_dupont_report.csv")
-    return _clean_records(df) if df is not None else []
+    # Computed from the served data rather than read from the pipeline's
+    # comps_dupont_report.csv, so a fix to the comps shows on the next deploy.
+    return _clean_records(comps_dupont_table(_load_scored()))
 
 
 @app.get("/api/explanations")

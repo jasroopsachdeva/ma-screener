@@ -49,6 +49,7 @@ def compute_sector_comps(df: pd.DataFrame) -> pd.DataFrame:
         if metric not in comps.columns:
             continue
         sector_median = comps.groupby("sector")[metric].transform("median")
+        comps[f"{metric}_sector_median"] = sector_median
         comps[f"{metric}_vs_sector_median"] = comps[metric] - sector_median
         comps[f"{metric}_pct_vs_sector_median"] = (
             (comps[metric] - sector_median) / sector_median
@@ -143,25 +144,44 @@ def compute_dupont(df: pd.DataFrame) -> pd.DataFrame:
     return dupont
 
 
+DUPONT_FACTORS = {"margin": "net_margin", "asset turnover": "asset_turnover", "leverage": "equity_multiplier"}
+
+REPORT_COLUMNS = [
+    "rank", "ticker", "sector", "sector_rank", "composite_score",
+    "trailing_pe", "trailing_pe_sector_median", "trailing_pe_vs_sector_median", "valuation_label",
+    "return_on_equity", "net_margin", "asset_turnover", "equity_multiplier", "roe_edge",
+    "dupont_implied_roe", "dupont_vs_reported_roe_gap",
+]
+
+
+def roe_edge(dupont: pd.DataFrame) -> pd.Series:
+    """The DuPont factor where each company sits furthest above its sector's
+    median: "margin" or "asset turnover" = operating quality, "leverage" = ROE
+    lifted by debt. Relative to the sector, since banks are all leveraged.
+    Blank when ROE isn't positive, a factor is missing, or none beats the median."""
+    rel = pd.DataFrame({name: dupont[col] / dupont.groupby("sector")[col].transform("median")
+                        for name, col in DUPONT_FACTORS.items()})
+    known = rel.notna().all(axis=1) & (dupont["return_on_equity"] > 0) & (rel.max(axis=1) > 1)
+    return rel.fillna(float("-inf")).idxmax(axis=1).where(known)
+
+
+def comps_dupont_table(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
+    """Comps + DuPont for the top_n companies, benchmarked against each WHOLE
+    sector. Medians used to be taken after cutting to the top 10, so most
+    companies were compared only with themselves (8 of 10 labels wrong)."""
+    full = compute_dupont(compute_sector_comps(df))
+    full["roe_edge"] = roe_edge(full)
+    top = full[full["rank"] <= top_n].sort_values("rank")
+    return top[[c for c in REPORT_COLUMNS if c in top.columns]]
+
+
 def build_report(
     scored_path: str = "data/processed/scored_universe.csv",
     output_dir: str = "data/processed",
     top_n: int = 10,
 ) -> pd.DataFrame:
     df = load_scored_universe(scored_path)
-    shortlist = df[df["rank"] <= top_n].copy()
-
-    comps = compute_sector_comps(shortlist)
-    full = compute_dupont(comps)
-
-    output_cols = [
-        "rank", "ticker", "sector", "sector_rank", "composite_score",
-        "trailing_pe", "trailing_pe_vs_sector_median", "valuation_label",
-        "return_on_equity", "net_margin", "asset_turnover", "equity_multiplier",
-        "dupont_implied_roe", "dupont_vs_reported_roe_gap",
-    ]
-    output_cols = [c for c in output_cols if c in full.columns]
-    result = full[output_cols]
+    result = comps_dupont_table(df, top_n)
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     out_path = Path(output_dir) / "comps_dupont_report.csv"

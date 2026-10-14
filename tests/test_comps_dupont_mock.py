@@ -12,7 +12,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.comps_dupont import compute_sector_comps, compute_dupont
+from src.comps_dupont import compute_sector_comps, compute_dupont, comps_dupont_table
 
 # Real ACC.NS data, hand-verified earlier: total_debt/total_equity = 2.09%
 # matched the reported debt_to_equity almost exactly.
@@ -174,6 +174,31 @@ def test_implied_roe_does_not_double_count_leverage():
     print("PASS: DuPont-implied ROE equals NI/equity on a leveraged company (no double-counted leverage)")
 
 
+def test_comps_use_the_whole_sector_and_name_the_roe_edge():
+    """Sector medians come from every company in the sector, not just the
+    shortlist (which compared most companies with themselves and labelled
+    them 'in line'). The ROE edge names the factor furthest above the sector."""
+    def row(ticker, sector, rank, pe, margin, debt):
+        # turnover is revenue / equity as ingestion stores it; equity 100 for all
+        return {"ticker": ticker, "sector": sector, "rank": rank, "trailing_pe": pe, "net_margin": margin,
+                "asset_turnover": 1.0, "total_debt": debt, "total_equity": 100.0, "return_on_equity": margin}
+
+    df = pd.DataFrame(
+        [row("C0.NS", "cement", 1, 10.0, 0.30, 0.0)]
+        + [row(f"C{i}.NS", "cement", 50 + i, 20.0, 0.10, 0.0) for i in range(1, 5)]
+        + [row("B0.NS", "banking", 2, 8.0, 0.10, 900.0)]
+        + [row(f"B{i}.NS", "banking", 60 + i, 8.0, 0.10, 400.0) for i in range(1, 5)]
+    )
+    out = comps_dupont_table(df, top_n=2).set_index("ticker")
+
+    assert list(out.index) == ["C0.NS", "B0.NS"], "only the shortlist is reported"
+    assert out.loc["C0.NS", "trailing_pe_sector_median"] == 20.0, "median over all 5 cement companies"
+    assert out.loc["C0.NS", "valuation_label"] == "cheap vs sector", "P/E 10 vs a sector median of 20"
+    assert out.loc["C0.NS", "roe_edge"] == "margin"
+    assert out.loc["B0.NS", "roe_edge"] == "leverage", "10x equity vs a banking median of 5x"
+    print("PASS: comps benchmark against the whole sector; ROE edge names margin vs leverage correctly")
+
+
 if __name__ == "__main__":
     test_dupont_reconciles_with_real_acc_data()
     test_negative_equity_does_not_crash_and_is_flagged()
@@ -182,4 +207,5 @@ if __name__ == "__main__":
     test_gap_column_abs_does_not_crash_with_missing_roe()
     test_implied_roe_recovers_even_when_reported_roe_missing()
     test_implied_roe_does_not_double_count_leverage()
+    test_comps_use_the_whole_sector_and_name_the_roe_edge()
     print("\nAll comps + DuPont mock tests passed.")
