@@ -90,10 +90,30 @@ def test_summary_string_is_readable_and_mentions_key_facts():
     print(f"PASS: summary string is readable and includes ticker, rank, strongest/weakest factors:\n      \"{summary}\"")
 
 
+def test_strongest_factor_is_the_highest_score_not_the_heaviest_weight():
+    """NATIONALUM.NS on 2026-10-14: leverage (weight 0.20) scored 0.93 and
+    quality (weight 0.30) 0.87, but ranking by weighted contribution named
+    quality as the strongest factor. The summary also said '93th'."""
+    row = pd.Series({
+        "ticker": "X.NS", "sector": "metals_mining", "rank": 1, "sector_rank": 1,
+        "valuation_bucket_score": 0.80, "quality_bucket_score": 0.87,
+        "leverage_bucket_score": 0.93, "growth_bucket_score": 0.79,
+        "trailing_pe_score": 0.8, "ev_to_ebitda_score": 0.8,
+        "return_on_equity_score": 0.81, "net_margin_score": 0.93,
+        "debt_to_equity_ratio_score": 0.93, "revenue_growth_score": 0.79,
+    })
+    result = explain_company(row, WEIGHTS)
+    assert result["strongest_bucket"] == "leverage", f"highest score is leverage, got {result['strongest_bucket']}"
+    assert result["weakest_bucket"] == "growth"
+    assert "93rd percentile" in result["summary"], result["summary"]
+    print("PASS: strongest factor is the highest-scoring bucket, not the heaviest-weighted one; '93rd', not '93th'")
+
+
 if __name__ == "__main__":
     test_strongest_and_weakest_bucket_identified_correctly()
     test_strongest_metric_within_bucket_identified_correctly()
     test_bucket_contributions_sum_to_composite_when_all_buckets_present()
     test_missing_bucket_reweights_contributions_correctly()
     test_summary_string_is_readable_and_mentions_key_facts()
+    test_strongest_factor_is_the_highest_score_not_the_heaviest_weight()
     print("\nAll explainability mock tests passed.")

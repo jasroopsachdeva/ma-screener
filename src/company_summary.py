@@ -268,7 +268,7 @@ def generate_summary_pdf(ticker: str, output_path: str, **data_kwargs) -> str:
     if data.get("sector_peers"):
         story.append(Paragraph("Sector Peer Comparison", heading_style))
         story.append(Paragraph(
-            f"How {data['ticker']} compares to its closest-ranked peers in the same sector, for context.",
+            f"How {data['ticker']} compares to the top-ranked companies in its sector, for context.",
             muted_style,
         ))
         peer_rows = [["Ticker", "Rank", "Composite", "P/E"]]

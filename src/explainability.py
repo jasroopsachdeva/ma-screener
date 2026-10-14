@@ -86,6 +86,11 @@ def _weakest_metric_in_bucket(row: pd.Series, bucket: str) -> tuple:
     return worst_metric, scores[worst_metric]
 
 
+def _ordinal(n: int) -> str:
+    """93 -> '93rd' (the summary used to say '93th')."""
+    return f"{n}{'th' if 11 <= n % 100 <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
+
+
 def explain_company(row: pd.Series, weights: dict) -> dict:
     contributions = _bucket_contribution(row, weights)
     if not contributions:
@@ -94,8 +99,13 @@ def explain_company(row: pd.Series, weights: dict) -> dict:
             "summary": f"{row['ticker']}: insufficient data across all buckets to explain this score.",
         }
 
-    strongest_bucket = max(contributions, key=contributions.get)
-    weakest_bucket = min(contributions, key=contributions.get)
+    # Strongest/weakest = the bucket's own score. Picking by weighted
+    # contribution named a heavier-weighted bucket even when another scored
+    # higher (4 of the top 10 on 2026-10-14: NATIONALUM.NS was "strongest in
+    # quality" at 0.87 while its leverage scored 0.93).
+    bucket_scores = {b: row.get(f"{b}_bucket_score") for b in contributions}
+    strongest_bucket = max(bucket_scores, key=bucket_scores.get)
+    weakest_bucket = min(bucket_scores, key=bucket_scores.get)
 
     strong_metric, strong_metric_score = _strongest_metric_in_bucket(row, strongest_bucket)
     weak_metric, weak_metric_score = _weakest_metric_in_bucket(row, weakest_bucket)
@@ -111,7 +121,7 @@ def explain_company(row: pd.Series, weights: dict) -> dict:
     summary = (
         f"{row['ticker']}{sector_note} ranked {rank_note}. "
         f"Strongest factor: {strongest_bucket} (driven primarily by {strong_metric_label})"
-        + (f", scoring at the {int(strong_metric_score * 100)}th percentile within its sector on this metric" if strong_metric_score is not None else "")
+        + (f", scoring at the {_ordinal(int(strong_metric_score * 100))} percentile within its sector on this metric" if strong_metric_score is not None else "")
         + f". Weakest factor: {weakest_bucket} (driven primarily by {weak_metric_label})."
     )
 
