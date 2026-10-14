@@ -127,6 +127,18 @@ def test_missing_roe_derived_from_margin_and_turnover():
           f"{REAL_ACC_DATA['return_on_equity']:.4f}) and flagged; reported, negative-equity and outlier cases handled")
 
 
+def test_non_positive_multiples_are_not_meaningful():
+    """A negative EV/EBITDA (GODREJPROP.NS, -112.5) or P/E is not 'cheap', but
+    every 'lower = cheaper' ranking scored it as the cheapest in its sector.
+    It is nulled and flagged; the row and its other fields stay."""
+    cleaned, flags = clean_snapshot({**REAL_ACC_DATA, "ev_to_ebitda": -112.5, "trailing_pe": -8.0})
+    assert not flags.excluded
+    assert cleaned["ev_to_ebitda"] is None and cleaned["trailing_pe"] is None
+    assert {"ev_to_ebitda", "trailing_pe"} <= set(flags.outlier_fields)
+    assert cleaned["return_on_equity"] == REAL_ACC_DATA["return_on_equity"], "other fields untouched"
+    print("PASS: non-positive P/E and EV/EBITDA are nulled (not ranked as cheapest); the row is kept")
+
+
 if __name__ == "__main__":
     test_known_good_data_passes_clean()
     test_failed_fetch_excluded()
@@ -136,4 +148,5 @@ if __name__ == "__main__":
     test_outlier_field_nulled_but_row_kept()
     test_zero_revenue_proxy_flagged()
     test_missing_roe_derived_from_margin_and_turnover()
+    test_non_positive_multiples_are_not_meaningful()
     print("\nAll cleaning mock tests passed.")

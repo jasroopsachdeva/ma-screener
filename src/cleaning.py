@@ -30,12 +30,15 @@ logger = logging.getLogger(__name__)
 # Fields where a missing value is critical enough to exclude the row from scoring
 CRITICAL_FIELDS = ["market_cap", "price"]  # trailing_pe demoted 2026-08-05: null PE usually means negative EPS, which excluded loss-making firms — over-represented among acquisition targets
 
-# Sanity bounds — values outside these ranges are flagged as likely data errors,
-# not necessarily dropped, since some are legitimate extremes (e.g. loss-making
-# firms can have negative P/E). Tune these as you see real data.
+# Sanity bounds — values outside these ranges are flagged and nulled (the row
+# stays). Tune these as you see real data. A P/E or EV/EBITDA <= 0 (losses,
+# negative EBITDA) is a real number but not a valuation: scoring, comps and the
+# baseline all read "lower = cheaper", so it ranked as the CHEAPEST in its
+# sector (GODREJPROP.NS, EV/EBITDA -112.5, got realty's best score). Analysts
+# mark these "NM"; here they become missing.
 SANITY_BOUNDS = {
-    "trailing_pe": (-500, 500),
-    "ev_to_ebitda": (-200, 200),
+    "trailing_pe": (0, 500),
+    "ev_to_ebitda": (0, 200),
     "return_on_equity": (-5.0, 5.0),       # as decimal, e.g. 0.48 = 48%
     "debt_to_equity": (0, 1000),           # yfinance reports this as a %, not a ratio
     "revenue_growth": (-1.0, 5.0),         # -100% to +500%
