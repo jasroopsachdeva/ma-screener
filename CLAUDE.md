@@ -49,6 +49,11 @@ would silently push incomplete rows to the top of the ranking.
 `trailing_pe` was deliberately demoted from this list — treating it as critical
 dropped four otherwise-scoreable companies every run. Do not add it back.
 
+**A P/E or EV/EBITDA <= 0 is not cheap.** Scoring, comps and the baseline all
+rank multiples as "lower = cheaper", so a negative one (losses, negative EBITDA)
+ranked as the cheapest in its sector. `cleaning.py` bounds both at 0, so they
+are nulled and flagged like any outlier ("NM"); do not widen the bounds back.
+
 **ROE is partly derived, and `asset_turnover` is revenue / equity.**
 Yahoo stopped returning `returnOnEquity` for most NSE tickers in Aug 2026
 (95% coverage on Jul 9, 17% from Aug 18). `cleaning.py` fills only the missing
