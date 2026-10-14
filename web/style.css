@@ -384,6 +384,7 @@ footer {
 /* ---- Responsive ---- */
 @media (max-width: 720px) {
     #navbar { flex-wrap: wrap; gap: 10px; }
+    .nav-links { flex-wrap: wrap; }  /* else Best Targets and Tools sat off-screen on phones */
     .control-row { flex-direction: column; }
     .tools-menu { width: 300px; }
 }
@@ -407,3 +408,11 @@ footer {
 .tools-menu { width: 440px; max-width: calc(100vw - 32px); box-sizing: border-box; overflow: hidden; }
 .tools-menu * { min-width: 0; }
 .tool-desc, .tool-title { white-space: normal; overflow-wrap: break-word; }
+
+/* Phones: the dropdown was pinned to the Tools button's left edge and ran off
+   the right of the screen. Anchor it to the sticky navbar's width instead.
+   Last in the file so it wins over the .tools-menu width rule above. */
+@media (max-width: 720px) {
+    .tools-wrap { position: static; }
+    .tools-menu { left: 16px; right: 16px; width: auto; max-width: none; }
+}

@@ -59,6 +59,22 @@ def test_api_serves_newer_of_processed_and_snapshot():
     print("PASS: newer of data/processed and the latest snapshot is served; 'updated' comes from fetched_at")
 
 
+def test_shortlist_rank_change_vs_previous_run():
+    # "vs Prev." compares with the newest snapshot other than the one served.
+    def scored(ranks):
+        return "ticker,rank\n" + "".join(f"{t},{r}\n" for t, r in ranks.items())
+
+    with tempfile.TemporaryDirectory() as tmp:
+        _snap(tmp, "99", scored({"A.NS": 1, "B.NS": 2}))
+        served = _snap(tmp, "100", scored({"B.NS": 1, "A.NS": 2, "C.NS": 3}))
+        api._previous_ranks.cache_clear()
+        with patch.object(api, "ROOT", Path(tmp)), patch.object(api, "DATA_DIR", str(served)):
+            changes = {r["ticker"]: r["rank_change"] for r in api.get_shortlist()}
+        api._previous_ranks.cache_clear()
+    assert changes == {"B.NS": 1, "A.NS": -1, "C.NS": None}, changes
+    print("PASS: shortlist rank change is measured against the previous run; tickers new to it are null")
+
+
 def test_summary_pdf_reads_data_dir_not_cwd():
     ticker = api._load_scored()["ticker"].iloc[0]
     cwd = os.getcwd()
@@ -75,5 +91,6 @@ if __name__ == "__main__":
     test_api_serves_highest_run_number()
     test_api_without_any_data_falls_back_to_processed()
     test_api_serves_newer_of_processed_and_snapshot()
+    test_shortlist_rank_change_vs_previous_run()
     test_summary_pdf_reads_data_dir_not_cwd()
     print("\nAll API mock tests passed.")
