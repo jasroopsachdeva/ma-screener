@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Optional
 
 import pandas as pd
+import reportlab.platypus  # noqa: F401  load at startup: the PDF endpoint's lazy import added ~2.5 s to the first PDF after each Render wake
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
