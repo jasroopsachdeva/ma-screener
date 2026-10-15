@@ -215,6 +215,12 @@ def check_target_size(df: pd.DataFrame, acquirer_ticker: str, target_ticker: str
 def run_deal(df: pd.DataFrame, deal: DealInputs) -> DealResult:
     acquirer = _company_fundamentals(df, deal.acquirer_ticker, avg_price_days=deal.avg_price_days)
     target = _company_fundamentals(df, deal.target_ticker, avg_price_days=deal.avg_price_days)
+    return _deal_result(acquirer, target, deal)
+
+
+def _deal_result(acquirer: dict, target: dict, deal: DealInputs) -> DealResult:
+    """The deal math, given both companies' fundamentals. Split out so
+    find_best_targets computes the acquirer's once, not once per candidate."""
 
     # Premium is priced off the DEAL price basis (spot, or averaged if
     # avg_price_days was set) — this is the conventional real-world
@@ -545,50 +551,56 @@ def find_best_targets(
     candidate_tickers = df.loc[df["ticker"] != acquirer_ticker, "ticker"].tolist()
     rows, skipped, oversized = [], [], []
 
-    for target_ticker in candidate_tickers:
-        try:
-            target_row = df.loc[df["ticker"] == target_ticker].iloc[0]
-            target_market_cap = target_row.get("market_cap")
-            relative_size_pct = (
-                (target_market_cap / acquirer_market_cap) if pd.notna(target_market_cap) and target_market_cap > 0 else None
-            )
+    # Fundamentals once per company, from only the columns they need, and the
+    # size rule before any deal math. Pulling three full 40-column rows per
+    # candidate was ~95% of a request (~390 ms locally, ~4.5 s on Render).
+    slim = df[[c for c in ["ticker", "price", "market_cap", "return_on_equity", "total_equity", "total_debt"] if c in df.columns]]
+    info = df.set_index("ticker")[[c for c in ["market_cap", "sector", "composite_score", "sector_rank"] if c in df.columns]].to_dict("index")
+    acquirer = _company_fundamentals(slim, acquirer_ticker)
 
+    for target_ticker in candidate_tickers:
+        target_row = info[target_ticker]
+        target_market_cap = target_row.get("market_cap")
+        relative_size_pct = (
+            (target_market_cap / acquirer_market_cap) if pd.notna(target_market_cap) and target_market_cap > 0 else None
+        )
+        if relative_size_pct is not None and relative_size_pct > max_target_size_pct:
+            oversized.append(target_ticker)
+            continue
+
+        try:
             deal = DealInputs(
                 acquirer_ticker, target_ticker, premium_pct, cash_pct,
                 debt_funded_pct=debt_funded_pct, interest_rate=interest_rate, tax_rate=tax_rate,
             )
-            result = run_deal(df, deal)
-
-            if relative_size_pct is not None and relative_size_pct > max_target_size_pct:
-                oversized.append(target_ticker)
-                continue
-
-            row_data = {
-                "target": target_ticker,
-                "sector": target_row.get("sector"),
-                "relative_size_pct": round(relative_size_pct * 100, 1) if relative_size_pct is not None else None,
-                "accretion_dilution_pct": round(result.accretion_dilution_pct * 100, 2),
-                "pro_forma_eps": round(result.pro_forma_eps, 4),
-                "is_accretive": result.is_accretive,
-                "deal_value": round(result.deal_value, 0),
-            }
-            # Tie the target's own screening quality into the output —
-            # a target that's accretive purely on scale mismatch but a
-            # genuinely weak business (low composite_score) is a very
-            # different finding than one that's both accretive AND
-            # highly ranked by the multi-factor screen.
-            if "composite_score" in target_row.index:
-                row_data["target_composite_score"] = target_row.get("composite_score")
-            if "sector_rank" in target_row.index:
-                row_data["target_sector_rank"] = target_row.get("sector_rank")
-            if target_ticker in likelihood_map:
-                row_data["target_acquisition_likelihood_score"] = likelihood_map[target_ticker]["acquisition_likelihood_score"]
-                row_data["target_acquisition_likelihood_rank"] = likelihood_map[target_ticker]["acquisition_likelihood_rank"]
-
-            rows.append(row_data)
+            result = _deal_result(acquirer, _company_fundamentals(slim, target_ticker), deal)
         except ValueError:
             skipped.append(target_ticker)
             continue
+
+        row_data = {
+            "target": target_ticker,
+            "sector": target_row.get("sector"),
+            "relative_size_pct": round(relative_size_pct * 100, 1) if relative_size_pct is not None else None,
+            "accretion_dilution_pct": round(result.accretion_dilution_pct * 100, 2),
+            "pro_forma_eps": round(result.pro_forma_eps, 4),
+            "is_accretive": result.is_accretive,
+            "deal_value": round(result.deal_value, 0),
+        }
+        # Tie the target's own screening quality into the output —
+        # a target that's accretive purely on scale mismatch but a
+        # genuinely weak business (low composite_score) is a very
+        # different finding than one that's both accretive AND
+        # highly ranked by the multi-factor screen.
+        if "composite_score" in target_row:
+            row_data["target_composite_score"] = target_row.get("composite_score")
+        if "sector_rank" in target_row:
+            row_data["target_sector_rank"] = target_row.get("sector_rank")
+        if target_ticker in likelihood_map:
+            row_data["target_acquisition_likelihood_score"] = likelihood_map[target_ticker]["acquisition_likelihood_score"]
+            row_data["target_acquisition_likelihood_rank"] = likelihood_map[target_ticker]["acquisition_likelihood_rank"]
+
+        rows.append(row_data)
 
     if skipped:
         logger.warning(
@@ -605,8 +617,8 @@ def find_best_targets(
 
     if not rows:
         raise ValueError(
-            f"No valid targets could be evaluated for acquirer '{acquirer_ticker}' after "
-            f"skipping missing-data and oversized candidates — try raising max_target_size_pct."
+            f"No valid targets for {acquirer_ticker}: every other company is larger than "
+            f"{max_target_size_pct:.0%} of its size or is missing data. Raise the max target size to see more."
         )
 
     result_df = pd.DataFrame(rows).sort_values("accretion_dilution_pct", ascending=False).reset_index(drop=True)
