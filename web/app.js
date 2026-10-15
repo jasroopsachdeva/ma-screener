@@ -469,6 +469,8 @@ function renderBestTargets() {
     }).join("");
 }
 
+let bestTargetsRequest = 0;  // only the newest scan may render: an older, slower one would overwrite it
+
 const updateBestTargets = debounce(async () => {
     const acquirer = qs("#targets-acquirer").value;
     const tableEl = qs("#targets-table");
@@ -484,11 +486,19 @@ const updateBestTargets = debounce(async () => {
         max_target_size_pct: parseInt(qs("#targets-max-size").value, 10) / 100,
         top_n: 500,
     };
+    const id = ++bestTargetsRequest;
     tableEl.innerHTML = `<div class="loading">Scanning candidate targets&hellip;</div>`;
     try {
-        bestTargetsFullResult = await fetchJSON("/api/best-targets", { method: "POST", body: JSON.stringify(req) });
+        const result = await fetchJSON("/api/best-targets", { method: "POST", body: JSON.stringify(req) });
+        if (id !== bestTargetsRequest) return;
+        bestTargetsFullResult = result;
         renderBestTargets();
     } catch (e) {
+        if (id !== bestTargetsRequest) return;
+        // Clear the previous acquirer's caption and chart so they don't sit beside the error.
+        bestTargetsFullResult = [];
+        qs("#targets-caption").textContent = "";
+        qs("#targets-chart").innerHTML = "";
         tableEl.innerHTML = `<div class="error-state">${escapeHtml(e.message)}</div>`;
     }
 }, 350);
