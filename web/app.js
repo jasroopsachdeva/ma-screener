@@ -331,11 +331,13 @@ function renderHeatmap(container, best, grid) {
     container.innerHTML = html;
 }
 
+let dealRequest = 0;  // only the newest update may render: an older, slower one would overwrite it
 const updateDeal = debounce(async () => {
     const acquirer = qs("#deal-acquirer").value;
     const target = qs("#deal-target").value;
     const resultsEl = qs("#deal-results");
     const heatmapEl = qs("#deal-heatmap");
+    const id = ++dealRequest;
 
     if (!acquirer || !target || acquirer === target) {
         resultsEl.innerHTML = `<div class="error-state">Acquirer and target must be different companies.</div>`;
@@ -347,8 +349,16 @@ const updateDeal = debounce(async () => {
     const req = currentDealRequest();
     // Keep the address bar in sync so the current pair can be shared or bookmarked.
     history.replaceState(null, "", `?acquirer=${encodeURIComponent(acquirer)}&target=${encodeURIComponent(target)}`);
+    const post = url => fetchJSON(url, { method: "POST", body: JSON.stringify(req) });
+    const withSynergies = req.revenue_synergy_pct > 0 || req.cost_synergy_pct > 0;
     try {
-        const result = await fetchJSON("/api/deal", { method: "POST", body: JSON.stringify(req) });
+        // Independent calls: run them together rather than one after another.
+        const [result, multiYear, heatmapResult] = await Promise.all([
+            post("/api/deal"),
+            withSynergies ? post("/api/deal/multi-year?years=3") : null,
+            post("/api/deal/heatmap"),
+        ]);
+        if (id !== dealRequest) return;
         resultsEl.innerHTML = `
             <div class="metric-row">
                 <div class="metric-card">
@@ -367,8 +377,7 @@ const updateDeal = debounce(async () => {
             </div>
         `;
 
-        if (req.revenue_synergy_pct > 0 || req.cost_synergy_pct > 0) {
-            const multiYear = await fetchJSON("/api/deal/multi-year?years=3", { method: "POST", body: JSON.stringify(req) });
+        if (multiYear) {
             qs("#deal-multi-year-wrap").style.display = "block";
             renderTable(qs("#deal-multi-year-table"), [
                 { key: "year", label: "Year", type: "int" },
@@ -383,11 +392,13 @@ const updateDeal = debounce(async () => {
             qs("#deal-multi-year-wrap").style.display = "none";
         }
 
-        const heatmapResult = await fetchJSON("/api/deal/heatmap", { method: "POST", body: JSON.stringify(req) });
         renderHeatmap(heatmapEl, heatmapResult.best, heatmapResult.grid);
     } catch (e) {
+        if (id !== dealRequest) return;
         resultsEl.innerHTML = `<div class="error-state">${escapeHtml(e.message)}</div>`;
         heatmapEl.innerHTML = "";
+        // The previous pair's multi-year table would otherwise stay beside the error.
+        qs("#deal-multi-year-wrap").style.display = "none";
     }
 }, 300);
 
