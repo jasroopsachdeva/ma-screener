@@ -326,6 +326,9 @@ def run_sensitivity(
 
     revenue_synergy_pct/cost_synergy_pct likewise apply uniformly across
     the whole sweep (see DealInputs docstring for the synergy model)."""
+    # Fundamentals don't vary across the grid: read both companies once, not per cell.
+    acquirer = _company_fundamentals(df, acquirer_ticker)
+    target = _company_fundamentals(df, target_ticker)
     rows = []
     for premium in premium_range:
         for cash_pct in cash_pct_range:
@@ -334,7 +337,7 @@ def run_sensitivity(
                 debt_funded_pct=debt_funded_pct, interest_rate=interest_rate, tax_rate=tax_rate,
                 revenue_synergy_pct=revenue_synergy_pct, cost_synergy_pct=cost_synergy_pct,
             )
-            result = run_deal(df, deal)
+            result = _deal_result(acquirer, target, deal)
             rows.append({
                 "premium_pct": premium,
                 "cash_pct": cash_pct,
