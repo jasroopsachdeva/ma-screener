@@ -1,0 +1,299 @@
+2026-11-23 11:51:31,299 [INFO] __main__: Logging to file: logs/pipeline_run_2026-11-23T11-51-31Z.log
+2026-11-23 11:51:31,299 [INFO] __main__: === Stage 1/8: Ingestion ===
+2026-11-23 11:51:31,319 [INFO] src.ingestion: [ACC.NS] fetching fresh data
+2026-11-23 11:51:32,269 [INFO] src.ingestion: [AMBUJACEM.NS] fetching fresh data
+2026-11-23 11:51:33,148 [INFO] src.ingestion: [ULTRACEMCO.NS] fetching fresh data
+2026-11-23 11:51:33,995 [INFO] src.ingestion: [SHREECEM.NS] fetching fresh data
+2026-11-23 11:51:34,873 [INFO] src.ingestion: [JKCEMENT.NS] fetching fresh data
+2026-11-23 11:51:35,693 [INFO] src.ingestion: [RAMCOCEM.NS] fetching fresh data
+2026-11-23 11:51:36,593 [INFO] src.ingestion: [HEIDELBERG.NS] fetching fresh data
+2026-11-23 11:51:37,408 [INFO] src.ingestion: [DALBHARAT.NS] fetching fresh data
+2026-11-23 11:51:38,251 [INFO] src.ingestion: [INFY.NS] fetching fresh data
+2026-11-23 11:51:39,185 [INFO] src.ingestion: [TCS.NS] fetching fresh data
+2026-11-23 11:51:39,991 [INFO] src.ingestion: [WIPRO.NS] fetching fresh data
+2026-11-23 11:51:40,976 [INFO] src.ingestion: [HCLTECH.NS] fetching fresh data
+2026-11-23 11:51:41,845 [INFO] src.ingestion: [TECHM.NS] fetching fresh data
+2026-11-23 11:51:42,750 [INFO] src.ingestion: [LTIM.NS] fetching fresh data
+2026-11-23 11:51:42,892 [ERROR] yfinance: HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: LTIM.NS"}}}
+2026-11-23 11:51:42,991 [WARNING] src.ingestion: [LTIM.NS] attempt 1 failed: yfinance returned an empty info payload for LTIM.NS (no exception, but no usable data — likely a transient Yahoo-side issue or an invalid/delisted symbol)
+2026-11-23 11:51:45,176 [ERROR] yfinance: HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: LTIM.NS"}}}
+2026-11-23 11:51:45,222 [WARNING] src.ingestion: [LTIM.NS] attempt 2 failed: yfinance returned an empty info payload for LTIM.NS (no exception, but no usable data — likely a transient Yahoo-side issue or an invalid/delisted symbol)
+2026-11-23 11:51:49,359 [ERROR] yfinance: HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: LTIM.NS"}}}
+2026-11-23 11:51:49,412 [WARNING] src.ingestion: [LTIM.NS] attempt 3 failed: yfinance returned an empty info payload for LTIM.NS (no exception, but no usable data — likely a transient Yahoo-side issue or an invalid/delisted symbol)
+2026-11-23 11:51:49,813 [INFO] src.ingestion: [PERSISTENT.NS] fetching fresh data
+2026-11-23 11:51:50,653 [INFO] src.ingestion: [COFORGE.NS] fetching fresh data
+2026-11-23 11:51:51,553 [INFO] src.ingestion: [MPHASIS.NS] fetching fresh data
+2026-11-23 11:51:52,400 [INFO] src.ingestion: [LTTS.NS] fetching fresh data
+2026-11-23 11:51:53,295 [INFO] src.ingestion: [TATAELXSI.NS] fetching fresh data
+2026-11-23 11:51:54,244 [INFO] src.ingestion: [CYIENT.NS] fetching fresh data
+2026-11-23 11:51:55,154 [INFO] src.ingestion: [KPITTECH.NS] fetching fresh data
+2026-11-23 11:51:56,117 [INFO] src.ingestion: [HDFCBANK.NS] fetching fresh data
+2026-11-23 11:51:56,912 [INFO] src.ingestion: [ICICIBANK.NS] fetching fresh data
+2026-11-23 11:51:57,842 [INFO] src.ingestion: [SBIN.NS] fetching fresh data
+2026-11-23 11:51:58,666 [INFO] src.ingestion: [AXISBANK.NS] fetching fresh data
+2026-11-23 11:51:59,647 [INFO] src.ingestion: [KOTAKBANK.NS] fetching fresh data
+2026-11-23 11:52:00,615 [INFO] src.ingestion: [INDUSINDBK.NS] fetching fresh data
+2026-11-23 11:52:01,403 [INFO] src.ingestion: [FEDERALBNK.NS] fetching fresh data
+2026-11-23 11:52:02,189 [INFO] src.ingestion: [BANDHANBNK.NS] fetching fresh data
+2026-11-23 11:52:02,978 [INFO] src.ingestion: [IDFCFIRSTB.NS] fetching fresh data
+2026-11-23 11:52:03,817 [INFO] src.ingestion: [PNB.NS] fetching fresh data
+2026-11-23 11:52:04,695 [INFO] src.ingestion: [BANKBARODA.NS] fetching fresh data
+2026-11-23 11:52:05,635 [INFO] src.ingestion: [CANBK.NS] fetching fresh data
+2026-11-23 11:52:06,460 [INFO] src.ingestion: [UNIONBANK.NS] fetching fresh data
+2026-11-23 11:52:07,282 [INFO] src.ingestion: [AUBANK.NS] fetching fresh data
+2026-11-23 11:52:08,206 [INFO] src.ingestion: [RBLBANK.NS] fetching fresh data
+2026-11-23 11:52:09,110 [INFO] src.ingestion: [BANKINDIA.NS] fetching fresh data
+2026-11-23 11:52:09,866 [INFO] src.ingestion: [CENTRALBK.NS] fetching fresh data
+2026-11-23 11:52:10,704 [INFO] src.ingestion: [IOB.NS] fetching fresh data
+2026-11-23 11:52:11,582 [INFO] src.ingestion: [UCOBANK.NS] fetching fresh data
+2026-11-23 11:52:12,398 [INFO] src.ingestion: [BAJFINANCE.NS] fetching fresh data
+2026-11-23 11:52:13,246 [INFO] src.ingestion: [BAJAJFINSV.NS] fetching fresh data
+2026-11-23 11:52:14,034 [INFO] src.ingestion: [CHOLAFIN.NS] fetching fresh data
+2026-11-23 11:52:14,799 [INFO] src.ingestion: [MUTHOOTFIN.NS] fetching fresh data
+2026-11-23 11:52:15,660 [INFO] src.ingestion: [LICHSGFIN.NS] fetching fresh data
+2026-11-23 11:52:16,672 [INFO] src.ingestion: [SHRIRAMFIN.NS] fetching fresh data
+2026-11-23 11:52:17,533 [INFO] src.ingestion: [PFC.NS] fetching fresh data
+2026-11-23 11:52:18,326 [INFO] src.ingestion: [RECLTD.NS] fetching fresh data
+2026-11-23 11:52:19,087 [INFO] src.ingestion: [IRFC.NS] fetching fresh data
+2026-11-23 11:52:19,911 [INFO] src.ingestion: [HUDCO.NS] fetching fresh data
+2026-11-23 11:52:20,777 [INFO] src.ingestion: [BAJAJHLDNG.NS] fetching fresh data
+2026-11-23 11:52:21,703 [INFO] src.ingestion: [SBICARD.NS] fetching fresh data
+2026-11-23 11:52:22,487 [INFO] src.ingestion: [MANAPPURAM.NS] fetching fresh data
+2026-11-23 11:52:23,304 [INFO] src.ingestion: [POONAWALLA.NS] fetching fresh data
+2026-11-23 11:52:24,273 [INFO] src.ingestion: [HDFCLIFE.NS] fetching fresh data
+2026-11-23 11:52:25,047 [INFO] src.ingestion: [SBILIFE.NS] fetching fresh data
+2026-11-23 11:52:25,807 [INFO] src.ingestion: [ICICIPRULI.NS] fetching fresh data
+2026-11-23 11:52:26,709 [INFO] src.ingestion: [ICICIGI.NS] fetching fresh data
+2026-11-23 11:52:27,594 [INFO] src.ingestion: [LICI.NS] fetching fresh data
+2026-11-23 11:52:28,426 [INFO] src.ingestion: [GICRE.NS] fetching fresh data
+2026-11-23 11:52:29,415 [INFO] src.ingestion: [MARUTI.NS] fetching fresh data
+2026-11-23 11:52:30,362 [INFO] src.ingestion: [TMPV.NS] fetching fresh data
+2026-11-23 11:52:31,228 [INFO] src.ingestion: [TMCV.NS] fetching fresh data
+2026-11-23 11:52:32,051 [INFO] src.ingestion: [M&M.NS] fetching fresh data
+2026-11-23 11:52:33,064 [INFO] src.ingestion: [EICHERMOT.NS] fetching fresh data
+2026-11-23 11:52:33,928 [INFO] src.ingestion: [HEROMOTOCO.NS] fetching fresh data
+2026-11-23 11:52:34,873 [INFO] src.ingestion: [BAJAJ-AUTO.NS] fetching fresh data
+2026-11-23 11:52:35,742 [INFO] src.ingestion: [TVSMOTOR.NS] fetching fresh data
+2026-11-23 11:52:36,713 [INFO] src.ingestion: [ASHOKLEY.NS] fetching fresh data
+2026-11-23 11:52:37,768 [INFO] src.ingestion: [BHARATFORG.NS] fetching fresh data
+2026-11-23 11:52:38,781 [INFO] src.ingestion: [MOTHERSON.NS] fetching fresh data
+2026-11-23 11:52:39,575 [INFO] src.ingestion: [BOSCHLTD.NS] fetching fresh data
+2026-11-23 11:52:40,586 [INFO] src.ingestion: [MRF.NS] fetching fresh data
+2026-11-23 11:52:41,562 [INFO] src.ingestion: [ENDURANCE.NS] fetching fresh data
+2026-11-23 11:52:42,469 [INFO] src.ingestion: [EXIDEIND.NS] fetching fresh data
+2026-11-23 11:52:43,334 [INFO] src.ingestion: [ARE&M.NS] fetching fresh data
+2026-11-23 11:52:44,254 [INFO] src.ingestion: [SUNDRMFAST.NS] fetching fresh data
+2026-11-23 11:52:45,257 [INFO] src.ingestion: [UNOMINDA.NS] fetching fresh data
+2026-11-23 11:52:46,056 [INFO] src.ingestion: [SUNPHARMA.NS] fetching fresh data
+2026-11-23 11:52:46,815 [INFO] src.ingestion: [DRREDDY.NS] fetching fresh data
+2026-11-23 11:52:47,839 [INFO] src.ingestion: [CIPLA.NS] fetching fresh data
+2026-11-23 11:52:48,717 [INFO] src.ingestion: [DIVISLAB.NS] fetching fresh data
+2026-11-23 11:52:49,604 [INFO] src.ingestion: [LUPIN.NS] fetching fresh data
+2026-11-23 11:52:50,467 [INFO] src.ingestion: [AUROPHARMA.NS] fetching fresh data
+2026-11-23 11:52:51,432 [INFO] src.ingestion: [BIOCON.NS] fetching fresh data
+2026-11-23 11:52:52,266 [INFO] src.ingestion: [TORNTPHARM.NS] fetching fresh data
+2026-11-23 11:52:53,246 [INFO] src.ingestion: [ALKEM.NS] fetching fresh data
+2026-11-23 11:52:54,057 [INFO] src.ingestion: [ABBOTINDIA.NS] fetching fresh data
+2026-11-23 11:52:54,839 [INFO] src.ingestion: [APOLLOHOSP.NS] fetching fresh data
+2026-11-23 11:52:55,777 [INFO] src.ingestion: [FORTIS.NS] fetching fresh data
+2026-11-23 11:52:56,664 [INFO] src.ingestion: [LALPATHLAB.NS] fetching fresh data
+2026-11-23 11:52:57,543 [INFO] src.ingestion: [METROPOLIS.NS] fetching fresh data
+2026-11-23 11:52:58,388 [INFO] src.ingestion: [GLAND.NS] fetching fresh data
+2026-11-23 11:52:59,289 [INFO] src.ingestion: [LAURUSLABS.NS] fetching fresh data
+2026-11-23 11:53:00,250 [INFO] src.ingestion: [GLENMARK.NS] fetching fresh data
+2026-11-23 11:53:01,057 [INFO] src.ingestion: [IPCALAB.NS] fetching fresh data
+2026-11-23 11:53:02,022 [INFO] src.ingestion: [HINDUNILVR.NS] fetching fresh data
+2026-11-23 11:53:02,995 [INFO] src.ingestion: [ITC.NS] fetching fresh data
+2026-11-23 11:53:03,815 [INFO] src.ingestion: [NESTLEIND.NS] fetching fresh data
+2026-11-23 11:53:04,810 [INFO] src.ingestion: [BRITANNIA.NS] fetching fresh data
+2026-11-23 11:53:05,695 [INFO] src.ingestion: [DABUR.NS] fetching fresh data
+2026-11-23 11:53:06,602 [INFO] src.ingestion: [GODREJCP.NS] fetching fresh data
+2026-11-23 11:53:07,505 [INFO] src.ingestion: [MARICO.NS] fetching fresh data
+2026-11-23 11:53:08,393 [INFO] src.ingestion: [COLPAL.NS] fetching fresh data
+2026-11-23 11:53:09,283 [INFO] src.ingestion: [TATACONSUM.NS] fetching fresh data
+2026-11-23 11:53:10,155 [INFO] src.ingestion: [VBL.NS] fetching fresh data
+2026-11-23 11:53:10,963 [INFO] src.ingestion: [UNITDSPR.NS] fetching fresh data
+2026-11-23 11:53:11,884 [INFO] src.ingestion: [EMAMILTD.NS] fetching fresh data
+2026-11-23 11:53:12,737 [INFO] src.ingestion: [TATASTEEL.NS] fetching fresh data
+2026-11-23 11:53:13,617 [INFO] src.ingestion: [JSWSTEEL.NS] fetching fresh data
+2026-11-23 11:53:14,556 [INFO] src.ingestion: [HINDALCO.NS] fetching fresh data
+2026-11-23 11:53:15,424 [INFO] src.ingestion: [VEDL.NS] fetching fresh data
+2026-11-23 11:53:16,305 [INFO] src.ingestion: [COALINDIA.NS] fetching fresh data
+2026-11-23 11:53:17,316 [INFO] src.ingestion: [NMDC.NS] fetching fresh data
+2026-11-23 11:53:18,193 [INFO] src.ingestion: [SAIL.NS] fetching fresh data
+2026-11-23 11:53:19,032 [INFO] src.ingestion: [JINDALSTEL.NS] fetching fresh data
+2026-11-23 11:53:19,953 [INFO] src.ingestion: [APLAPOLLO.NS] fetching fresh data
+2026-11-23 11:53:20,800 [INFO] src.ingestion: [NATIONALUM.NS] fetching fresh data
+2026-11-23 11:53:21,722 [INFO] src.ingestion: [HINDCOPPER.NS] fetching fresh data
+2026-11-23 11:53:22,643 [INFO] src.ingestion: [RATNAMANI.NS] fetching fresh data
+2026-11-23 11:53:23,630 [INFO] src.ingestion: [HINDZINC.NS] fetching fresh data
+2026-11-23 11:53:24,580 [INFO] src.ingestion: [WELCORP.NS] fetching fresh data
+2026-11-23 11:53:25,468 [INFO] src.ingestion: [JSL.NS] fetching fresh data
+2026-11-23 11:53:26,514 [INFO] src.ingestion: [RELIANCE.NS] fetching fresh data
+2026-11-23 11:53:27,300 [INFO] src.ingestion: [ONGC.NS] fetching fresh data
+2026-11-23 11:53:28,153 [INFO] src.ingestion: [BPCL.NS] fetching fresh data
+2026-11-23 11:53:29,085 [INFO] src.ingestion: [IOC.NS] fetching fresh data
+2026-11-23 11:53:30,007 [INFO] src.ingestion: [GAIL.NS] fetching fresh data
+2026-11-23 11:53:30,860 [INFO] src.ingestion: [NTPC.NS] fetching fresh data
+2026-11-23 11:53:31,770 [INFO] src.ingestion: [POWERGRID.NS] fetching fresh data
+2026-11-23 11:53:32,627 [INFO] src.ingestion: [TATAPOWER.NS] fetching fresh data
+2026-11-23 11:53:33,514 [INFO] src.ingestion: [ADANIGREEN.NS] fetching fresh data
+2026-11-23 11:53:34,353 [INFO] src.ingestion: [ADANIPOWER.NS] fetching fresh data
+2026-11-23 11:53:35,295 [INFO] src.ingestion: [TORNTPOWER.NS] fetching fresh data
+2026-11-23 11:53:36,112 [INFO] src.ingestion: [LT.NS] fetching fresh data
+2026-11-23 11:53:36,997 [INFO] src.ingestion: [SIEMENS.NS] fetching fresh data
+2026-11-23 11:53:37,873 [INFO] src.ingestion: [ABB.NS] fetching fresh data
+2026-11-23 11:53:38,682 [INFO] src.ingestion: [HAL.NS] fetching fresh data
+2026-11-23 11:53:39,599 [INFO] src.ingestion: [BEL.NS] fetching fresh data
+2026-11-23 11:53:40,532 [INFO] src.ingestion: [BHEL.NS] fetching fresh data
+2026-11-23 11:53:41,347 [INFO] src.ingestion: [CUMMINSIND.NS] fetching fresh data
+2026-11-23 11:53:42,394 [INFO] src.ingestion: [THERMAX.NS] fetching fresh data
+2026-11-23 11:53:43,443 [INFO] src.ingestion: [POLYCAB.NS] fetching fresh data
+2026-11-23 11:53:44,304 [INFO] src.ingestion: [KEI.NS] fetching fresh data
+2026-11-23 11:53:45,240 [INFO] src.ingestion: [HAVELLS.NS] fetching fresh data
+2026-11-23 11:53:46,177 [INFO] src.ingestion: [CROMPTON.NS] fetching fresh data
+2026-11-23 11:53:47,066 [INFO] src.ingestion: [SUPREMEIND.NS] fetching fresh data
+2026-11-23 11:53:47,850 [INFO] src.ingestion: [ASTRAL.NS] fetching fresh data
+2026-11-23 11:53:48,629 [INFO] src.ingestion: [GRINDWELL.NS] fetching fresh data
+2026-11-23 11:53:49,452 [INFO] src.ingestion: [CARBORUNIV.NS] fetching fresh data
+2026-11-23 11:53:50,437 [INFO] src.ingestion: [TIMKEN.NS] fetching fresh data
+2026-11-23 11:53:51,229 [INFO] src.ingestion: [SKFINDIA.NS] fetching fresh data
+2026-11-23 11:53:52,117 [INFO] src.ingestion: [SRF.NS] fetching fresh data
+2026-11-23 11:53:53,010 [INFO] src.ingestion: [PIIND.NS] fetching fresh data
+2026-11-23 11:53:53,922 [INFO] src.ingestion: [DEEPAKNTR.NS] fetching fresh data
+2026-11-23 11:53:54,868 [INFO] src.ingestion: [AARTIIND.NS] fetching fresh data
+2026-11-23 11:53:55,659 [INFO] src.ingestion: [NAVINFLUOR.NS] fetching fresh data
+2026-11-23 11:53:56,572 [INFO] src.ingestion: [UPL.NS] fetching fresh data
+2026-11-23 11:53:57,367 [INFO] src.ingestion: [COROMANDEL.NS] fetching fresh data
+2026-11-23 11:53:58,194 [INFO] src.ingestion: [CHAMBLFERT.NS] fetching fresh data
+2026-11-23 11:53:58,965 [INFO] src.ingestion: [GNFC.NS] fetching fresh data
+2026-11-23 11:53:59,826 [INFO] src.ingestion: [PIDILITIND.NS] fetching fresh data
+2026-11-23 11:54:00,757 [INFO] src.ingestion: [TATACHEM.NS] fetching fresh data
+2026-11-23 11:54:01,719 [INFO] src.ingestion: [GHCL.NS] fetching fresh data
+2026-11-23 11:54:02,576 [INFO] src.ingestion: [TITAN.NS] fetching fresh data
+2026-11-23 11:54:03,413 [INFO] src.ingestion: [DMART.NS] fetching fresh data
+2026-11-23 11:54:04,198 [INFO] src.ingestion: [TRENT.NS] fetching fresh data
+2026-11-23 11:54:04,994 [INFO] src.ingestion: [BATAINDIA.NS] fetching fresh data
+2026-11-23 11:54:05,994 [INFO] src.ingestion: [PAGEIND.NS] fetching fresh data
+2026-11-23 11:54:06,752 [INFO] src.ingestion: [JUBLFOOD.NS] fetching fresh data
+2026-11-23 11:54:07,630 [INFO] src.ingestion: [VOLTAS.NS] fetching fresh data
+2026-11-23 11:54:08,470 [INFO] src.ingestion: [DIXON.NS] fetching fresh data
+2026-11-23 11:54:09,533 [INFO] src.ingestion: [RELAXO.NS] fetching fresh data
+2026-11-23 11:54:10,499 [INFO] src.ingestion: [KAJARIACER.NS] fetching fresh data
+2026-11-23 11:54:11,477 [INFO] src.ingestion: [WHIRLPOOL.NS] fetching fresh data
+2026-11-23 11:54:12,465 [INFO] src.ingestion: [BLUESTARCO.NS] fetching fresh data
+2026-11-23 11:54:13,447 [INFO] src.ingestion: [PGHH.NS] fetching fresh data
+2026-11-23 11:54:14,252 [INFO] src.ingestion: [GILLETTE.NS] fetching fresh data
+2026-11-23 11:54:15,004 [INFO] src.ingestion: [BHARTIARTL.NS] fetching fresh data
+2026-11-23 11:54:15,997 [INFO] src.ingestion: [IDEA.NS] fetching fresh data
+2026-11-23 11:54:16,901 [INFO] src.ingestion: [INDUSTOWER.NS] fetching fresh data
+2026-11-23 11:54:17,793 [INFO] src.ingestion: [PVRINOX.NS] fetching fresh data
+2026-11-23 11:54:18,673 [INFO] src.ingestion: [ZEEL.NS] fetching fresh data
+2026-11-23 11:54:19,737 [INFO] src.ingestion: [ADANIPORTS.NS] fetching fresh data
+2026-11-23 11:54:20,637 [INFO] src.ingestion: [ADANIENT.NS] fetching fresh data
+2026-11-23 11:54:21,427 [INFO] src.ingestion: [GMRAIRPORT.NS] fetching fresh data
+2026-11-23 11:54:22,284 [INFO] src.ingestion: [CONCOR.NS] fetching fresh data
+2026-11-23 11:54:23,216 [INFO] src.ingestion: [IRCTC.NS] fetching fresh data
+2026-11-23 11:54:24,068 [INFO] src.ingestion: [INDIGO.NS] fetching fresh data
+2026-11-23 11:54:24,874 [INFO] src.ingestion: [RVNL.NS] fetching fresh data
+2026-11-23 11:54:25,683 [INFO] src.ingestion: [IRCON.NS] fetching fresh data
+2026-11-23 11:54:26,534 [INFO] src.ingestion: [NBCC.NS] fetching fresh data
+2026-11-23 11:54:27,323 [INFO] src.ingestion: [NCC.NS] fetching fresh data
+2026-11-23 11:54:28,120 [INFO] src.ingestion: [MAZDOCK.NS] fetching fresh data
+2026-11-23 11:54:29,019 [INFO] src.ingestion: [COCHINSHIP.NS] fetching fresh data
+2026-11-23 11:54:29,864 [INFO] src.ingestion: [DLF.NS] fetching fresh data
+2026-11-23 11:54:30,854 [INFO] src.ingestion: [GODREJPROP.NS] fetching fresh data
+2026-11-23 11:54:31,843 [INFO] src.ingestion: [OBEROIRLTY.NS] fetching fresh data
+2026-11-23 11:54:32,781 [INFO] src.ingestion: [PRESTIGE.NS] fetching fresh data
+2026-11-23 11:54:33,724 [INFO] src.ingestion: [PHOENIXLTD.NS] fetching fresh data
+2026-11-23 11:54:34,663 [INFO] src.ingestion: [SOBHA.NS] fetching fresh data
+2026-11-23 11:54:35,539 [INFO] src.ingestion: Fetched 200/201 tickers successfully
+2026-11-23 11:54:35,540 [WARNING] src.ingestion: Failed tickers (excluded from downstream, not silently zeroed): ['LTIM.NS']
+2026-11-23 11:54:35,540 [INFO] __main__: Ingestion validation passed: 200/201 tickers (100%)
+2026-11-23 11:54:35,540 [INFO] __main__: === Stage 2/8: Cleaning ===
+2026-11-23 11:54:35,544 [WARNING] src.cleaning: [LTIM.NS] EXCLUDED: ingestion failed: yfinance returned an empty info payload for LTIM.NS (no exception, but no usable data — likely a transient Yahoo-side issue or an invalid/delisted symbol)
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [ABB.NS] non-critical missing fields: ['return_on_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [AUBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [AXISBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [WARNING] src.cleaning: [BAJAJHLDNG.NS] outlier values flagged: ['net_margin']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [BAJAJHLDNG.NS] non-critical missing fields: ['debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [BAJFINANCE.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [BANDHANBNK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [BANKBARODA.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [BANKINDIA.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [CANBK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [CENTRALBK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [CHOLAFIN.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [CROMPTON.NS] non-critical missing fields: ['trailing_pe']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [FEDERALBNK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,544 [INFO] src.cleaning: [GICRE.NS] non-critical missing fields: ['debt_to_equity']
+2026-11-23 11:54:35,544 [WARNING] src.cleaning: [GMRAIRPORT.NS] negative/zero equity — DuPont ROE math will be invalid downstream
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [GMRAIRPORT.NS] non-critical missing fields: ['return_on_equity', 'debt_to_equity']
+2026-11-23 11:54:35,545 [WARNING] src.cleaning: [GODREJPROP.NS] outlier values flagged: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [WARNING] src.cleaning: [HCLTECH.NS] outlier values flagged: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [HDFCBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [HUDCO.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [ICICIBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [WARNING] src.cleaning: [IDEA.NS] negative/zero equity — DuPont ROE math will be invalid downstream
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [IDEA.NS] non-critical missing fields: ['return_on_equity', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [IDFCFIRSTB.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [WARNING] src.cleaning: [INDIGO.NS] outlier values flagged: ['debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [INDIGO.NS] non-critical missing fields: ['trailing_pe']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [INDUSINDBK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [WARNING] src.cleaning: [INFY.NS] outlier values flagged: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [IOB.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [IRFC.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [KEI.NS] non-critical missing fields: ['return_on_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [KOTAKBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [LICHSGFIN.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [LICI.NS] non-critical missing fields: ['debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [MANAPPURAM.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [MUTHOOTFIN.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [PFC.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [PNB.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [POONAWALLA.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [RBLBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [RECLTD.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [SBICARD.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [SBILIFE.NS] non-critical missing fields: ['debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [SBIN.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [SHRIRAMFIN.NS] non-critical missing fields: ['ev_to_ebitda']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [SIEMENS.NS] non-critical missing fields: ['return_on_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [TATACHEM.NS] non-critical missing fields: ['trailing_pe']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [TMCV.NS] non-critical missing fields: ['return_on_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [TMPV.NS] non-critical missing fields: ['trailing_pe']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [UCOBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [UNIONBANK.NS] non-critical missing fields: ['ev_to_ebitda', 'debt_to_equity']
+2026-11-23 11:54:35,545 [INFO] src.cleaning: [VBL.NS] non-critical missing fields: ['return_on_equity']
+2026-11-23 11:54:35,545 [WARNING] src.cleaning: [ZEEL.NS] outlier values flagged: ['ev_to_ebitda']
+2026-11-23 11:54:35,547 [INFO] src.cleaning: Derived ROE as net_margin x asset_turnover for 5/200 tickers where Yahoo returned no returnOnEquity (flagged in the roe_derived column)
+2026-11-23 11:54:35,552 [INFO] src.cleaning: Cleaned 200/201 tickers -> data/processed/cleaned_universe.csv
+2026-11-23 11:54:35,552 [INFO] src.cleaning: Full flag audit trail -> data/processed/cleaning_flags.csv
+2026-11-23 11:54:35,552 [INFO] __main__: Cleaning validation passed: 200/201 tickers retained (100%)
+2026-11-23 11:54:35,552 [INFO] __main__: === Stage 3/8: Scoring ===
+2026-11-23 11:54:35,590 [INFO] src.scoring: Scored 200 companies -> data/processed/scored_universe.csv
+2026-11-23 11:54:35,590 [INFO] src.scoring: Top 10 shortlist -> data/processed/shortlist_top_n.csv
+2026-11-23 11:54:35,590 [WARNING] src.scoring: 25 companies scored on fewer than all 4 buckets (reweighted, not zero-filled) — see 'buckets_used' column: ['BANKINDIA.NS', 'UNIONBANK.NS', 'GICRE.NS', 'LICI.NS', 'CANBK.NS', 'IOB.NS', 'IDEA.NS', 'BANKBARODA.NS', 'AXISBANK.NS', 'PNB.NS', 'CENTRALBK.NS', 'FEDERALBNK.NS', 'HDFCBANK.NS', 'AUBANK.NS', 'ICICIBANK.NS', 'BANDHANBNK.NS', 'SBIN.NS', 'KOTAKBANK.NS', 'UCOBANK.NS', 'INDUSINDBK.NS', 'SBILIFE.NS', 'IDFCFIRSTB.NS', 'GMRAIRPORT.NS', 'RBLBANK.NS', 'BAJAJHLDNG.NS']
+2026-11-23 11:54:35,591 [INFO] __main__: Scoring validation passed: 200 companies ranked, all scores in valid range
+2026-11-23 11:54:35,591 [INFO] __main__: === Stage 4/8: Comps + DuPont ===
+2026-11-23 11:54:35,602 [INFO] src.comps_dupont: Comps + DuPont report for top 10 -> data/processed/comps_dupont_report.csv
+2026-11-23 11:54:35,602 [WARNING] src.comps_dupont: 2 companies have a DuPont-implied ROE that diverges >5pp from reported ROE (possible data inconsistency, worth a manual check): ['HINDZINC.NS', 'POLYCAB.NS']
+2026-11-23 11:54:35,602 [INFO] __main__: === Stage 5/8: Explainability ===
+2026-11-23 11:54:35,625 [INFO] src.explainability: Explanations for top 10 companies -> data/processed/explanations.csv
+2026-11-23 11:54:35,625 [INFO] __main__: === Stage 6/8: Baseline Comparison ===
+2026-11-23 11:54:35,629 [INFO] src.baseline_comparison: Baseline comparison -> data/processed/baseline_comparison.csv
+2026-11-23 11:54:35,629 [INFO] __main__: === Stage 7/8: Acquisition Likelihood ===
+2026-11-23 11:54:35,631 [INFO] src.acquisition_likelihood: 2 companies excluded from acquisition-likelihood scoring (negative/zero equity — financial distress, not a value-target thesis): ['IDEA.NS', 'GMRAIRPORT.NS']
+2026-11-23 11:54:35,638 [INFO] src.acquisition_likelihood: Acquisition likelihood scoring -> data/processed/acquisition_likelihood.csv
+2026-11-23 11:54:35,638 [INFO] __main__: === Stage 8/8: Historical Snapshot ===
+2026-11-23 11:54:35,643 [INFO] src.history_tracker: Recorded shortlist snapshot for 2026-11-23 (10 companies) -> data/history/shortlist_history.csv (5 distinct days tracked so far)
+2026-11-23 11:54:35,646 [INFO] src.history_tracker: Recorded acquisition-likelihood snapshot for 2026-11-23 (10 companies) -> data/history/acquisition_likelihood_history.csv (5 distinct days tracked so far)
+2026-11-23 11:54:35,646 [INFO] __main__: === Pipeline completed successfully ===
+2026-11-23 11:54:35,646 [INFO] __main__:   ingestion: {'total': 201, 'ok': 200}
+2026-11-23 11:54:35,646 [INFO] __main__:   cleaning: {'retained': 200, 'input': 201}
+2026-11-23 11:54:35,646 [INFO] __main__:   scoring: {'ranked': 200}
+2026-11-23 11:54:35,646 [INFO] __main__:   comps_dupont: {'companies': 10}
+2026-11-23 11:54:35,646 [INFO] __main__:   explainability: {'companies': 10}
+2026-11-23 11:54:35,646 [INFO] __main__:   baseline_comparison: {'correlation': np.float64(0.4750777181475131), 'overlap_pct': 0.1}
+2026-11-23 11:54:35,646 [INFO] __main__:   acquisition_likelihood: {'companies': 10}
+2026-11-23 11:54:35,646 [INFO] __main__:   history_tracker: {'recorded': True}
